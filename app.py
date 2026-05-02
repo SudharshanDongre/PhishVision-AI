@@ -64,6 +64,7 @@ section[data-testid="stSidebar"] > div {
     width: 21rem !important;
     min-width: 21rem !important;
     max-width: 21rem !important;
+    margin-top: -8px !important;
 }
 [data-testid="stSidebarResizer"] {
     display: none !important;
@@ -261,6 +262,7 @@ button { transition: background 0.2s ease !important; cursor: pointer !important
     letter-spacing: 0.06em;
     text-transform: uppercase;
     border: 1px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .landing-cta.primary {
@@ -269,10 +271,23 @@ button { transition: background 0.2s ease !important; cursor: pointer !important
     box-shadow: 0 18px 36px rgba(0, 212, 255, 0.22);
 }
 
+.landing-cta.primary:hover {
+    background: linear-gradient(135deg, #19e0ff 0%, #0a57d8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 34px rgba(0, 212, 255, 0.22);
+}
+
 .landing-cta.secondary {
     background: rgba(10, 14, 20, 0.52);
     color: #dfeaf6;
     border-color: rgba(0, 212, 255, 0.18);
+}
+
+.landing-cta.secondary:hover {
+    background: rgba(12, 18, 24, 0.64);
+    color: #e6f7ff;
+    border-color: rgba(0, 212, 255, 0.28);
+    transform: translateY(-1px);
 }
 
 .landing-hero-visual {
@@ -1081,16 +1096,28 @@ def _render_about_landing():
             letter-spacing: 0.06em;
             text-transform: uppercase;
             border: 1px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }}
         .landing-cta.primary {{
             background: linear-gradient(135deg, #00d4ff 0%, #0856ff 100%);
             color: #ffffff;
             box-shadow: 0 18px 36px rgba(0, 212, 255, 0.22);
         }}
+        .landing-cta.primary:hover {{
+            background: linear-gradient(135deg, #19e0ff 0%, #0a57d8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 14px 34px rgba(0, 212, 255, 0.22);
+        }}
         .landing-cta.secondary {{
             background: rgba(10, 14, 20, 0.52);
             color: #dfeaf6;
             border-color: rgba(0, 212, 255, 0.18);
+        }}
+        .landing-cta.secondary:hover {{
+            background: rgba(12, 18, 24, 0.64);
+            color: #e6f7ff;
+            border-color: rgba(0, 212, 255, 0.28);
+            transform: translateY(-1px);
         }}
         .landing-hero-visual {{
             position: relative;
@@ -1318,6 +1345,83 @@ def _render_about_landing():
     components.html(html, height=2200, scrolling=False)
 
 
+def _render_chrome_extension_page():
+    html = f"""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root {{ --bg:#0a0e14; --accent:#00d4ff; --text:#e2e8f0; }}
+        html,body {{ margin:0; background:var(--bg); color:var(--text); font-family:Inter, sans-serif; }}
+        .landing-page {{ padding:28px; box-sizing:border-box; }}
+        .landing-hero {{ border-radius:28px; padding:28px; background:linear-gradient(180deg, rgba(12,17,26,0.92), rgba(6,10,16,0.86)); border:1px solid rgba(0,212,255,0.18); }}
+        .landing-kicker {{ display:inline-block; padding:8px 12px; border-radius:999px; color:var(--accent); border:1px solid rgba(0,212,255,0.18); font-weight:700; text-transform:uppercase; font-size:0.78rem; }}
+        .landing-title {{ margin:16px 0; font-size:2.4rem; font-weight:800; color:#f7fbff; text-transform:uppercase; }}
+        .landing-copy {{ color:rgba(226,232,240,0.9); max-width:760px; font-size:1.02rem; line-height:1.6; }}
+        .landing-stat-row {{ display:flex; gap:12px; margin-top:18px; }}
+        .landing-chip {{ padding:10px 14px; border-radius:14px; background:rgba(7,13,21,0.72); border:1px solid rgba(0,212,255,0.14); color:var(--text); }}
+        .landing-cta {{ display:inline-block; margin-top:20px; padding:14px 18px; border-radius:16px; color:#fff; text-decoration:none; font-weight:700; transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }}
+        .landing-cta.primary {{ background:linear-gradient(135deg,#00d4ff 0%,#0856ff 100%); color:#fff; }}
+        .landing-cta.primary:hover {{ background:linear-gradient(135deg,#19e0ff 0%,#0a57d8 100%); transform:translateY(-1px); box-shadow:0 14px 34px rgba(0,212,255,0.22); }}
+        .landing-grid {{ display:grid; grid-template-columns:1fr 0.85fr; gap:20px; margin-top:22px; }}
+        .landing-panel {{ border-radius:22px; padding:20px; background:rgba(12,17,26,0.92); border:1px solid rgba(0,212,255,0.18); }}
+        .landing-panel.glass {{ background:rgba(10,14,20,0.42); backdrop-filter:blur(12px); }}
+        .feature-row {{ display:flex; gap:12px; align-items:flex-start; margin:12px 0; }}
+        .dot {{ width:12px; height:12px; border-radius:999px; display:inline-block; margin-top:6px; box-shadow:0 6px 18px rgba(0,0,0,0.4); }}
+        .install-step {{ border-radius:12px; padding:12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); margin:10px 0; }}
+        .warning-box {{ border-left:6px solid #ffaa00; padding:14px; border-radius:12px; background:rgba(26,18,0,0.6); color:#ffdca8; margin-top:18px; }}
+        [data-reveal] {{ opacity:0; transform:translateY(20px); transition:opacity 0.7s ease-out, transform 0.7s ease-out; }}
+        [data-reveal].is-visible {{ opacity:1; transform:translateY(0); }}
+        @media (max-width:900px) {{ .landing-grid {{ grid-template-columns:1fr; }} }}
+    </style>
+
+    <div class="landing-page">
+        <section class="landing-hero" data-reveal>
+            <div class="landing-kicker">Scan Any Website Instantly</div>
+            <h1 class="landing-title">PhishVision Chrome Extension</h1>
+            <p class="landing-copy">The same ML-powered phishing detection from this web app, now available directly in your browser. Scan any page in one click.</p>
+            <div class="landing-stat-row">
+                <div class="landing-chip">Real-time Detection</div>
+                <div class="landing-chip">4 ML Models</div>
+                <div class="landing-chip">Zero Setup Required</div>
+            </div>
+            <a class="landing-cta primary" href="https://github.com/SudharshanDongre/PhishVision-AI/raw/main/phishvision-extension.zip" target="_blank">⬇ DOWNLOAD EXTENSION</a>
+        </section>
+
+        <div class="landing-grid" data-reveal>
+            <div class="landing-panel">
+                <h3>Why use the Extension?</h3>
+                <div class="feature-row"><span class="dot" style="background:#00d4ff;"></span><div>Scans the current tab URL automatically</div></div>
+                <div class="feature-row"><span class="dot" style="background:#7ee3ff;"></span><div>Uses the same models as this web app</div></div>
+                <div class="feature-row"><span class="dot" style="background:#85ffb0;"></span><div>Choose between 4 detection engines</div></div>
+                <div class="feature-row"><span class="dot" style="background:#ffd27a;"></span><div>Shows confidence score and verdict instantly</div></div>
+            </div>
+
+            <div class="landing-panel glass">
+                <h3>How to Install</h3>
+                <div class="install-step"><strong>1.</strong> Download the ZIP file using the button above</div>
+                <div class="install-step"><strong>2.</strong> Extract / Unzip the downloaded file</div>
+                <div class="install-step"><strong>3.</strong> Open Chrome → go to <code>chrome://extensions/</code></div>
+                <div class="install-step"><strong>4.</strong> Enable Developer Mode (toggle, top-right)</div>
+                <div class="install-step"><strong>5.</strong> Click "Load unpacked" → select the extracted folder</div>
+                <div class="install-step"><strong>6.</strong> Pin the extension and start scanning!</div>
+            </div>
+        </div>
+
+        <div class="warning-box" data-reveal>⚠ First scan may take up to 30 seconds — the server wakes up automatically. All scans after that will be instant.</div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {{
+            const observer = new IntersectionObserver((entries) => {{
+                entries.forEach((entry) => {{ if (entry.isIntersecting) {{ entry.target.classList.add('is-visible'); }} }});
+            }}, {{ threshold: 0.1 }});
+            document.querySelectorAll('[data-reveal]').forEach((el) => {{ observer.observe(el); }});
+        }});
+    </script>
+    """
+
+    components.html(html, height=1200, scrolling=False)
+
+
 def _hash_password(password, salt=None):
     if salt is None:
         salt = secrets.token_hex(16)
@@ -1337,7 +1441,7 @@ def _verify_password(password, stored_hash):
 # ══════════════════════════════════════════════════════════════
 # BACKEND API CONFIG
 # ══════════════════════════════════════════════════════════════
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = os.getenv("BACKEND_URL", "https://phishvision-ai.onrender.com")
 
 def _api_register(email, full_name, password):
     """Register user via backend API."""
@@ -1345,7 +1449,7 @@ def _api_register(email, full_name, password):
         response = requests.post(
             f"{BACKEND_URL}/auth/register",
             json={"email": email, "full_name": full_name, "password": password},
-            timeout=5
+            timeout=30
         )
         return response.json()
     except Exception as e:
@@ -1357,7 +1461,7 @@ def _api_login(email, password):
         response = requests.post(
             f"{BACKEND_URL}/auth/login",
             json={"email": email, "password": password},
-            timeout=5
+            timeout=30
         )
         return response.json()
     except Exception as e:
@@ -1377,7 +1481,7 @@ def _api_update_profile(email, full_name=None, password=None):
             f"{BACKEND_URL}/auth/update",
             json=data,
             params=params,
-            timeout=5
+            timeout=30
         )
         return response.json()
     except Exception as e:
@@ -1387,7 +1491,7 @@ def _api_update_profile(email, full_name=None, password=None):
 def _api_get_user(email):
     """Fetch user info via backend API."""
     try:
-        response = requests.get(f"{BACKEND_URL}/auth/user/{email}", timeout=5)
+        response = requests.get(f"{BACKEND_URL}/auth/user/{email}", timeout=30)
         if response.status_code == 200:
             return {"success": True, "user": response.json()}
         return {"success": False, "message": "User not found"}
@@ -1726,7 +1830,7 @@ with st.sidebar:
         st.session_state.history = []
 
     page = st.session_state.page
-    if page not in {"About", "URL Scan", "Bulk Scan", "Intel Report"}:
+    if page not in {"About", "URL Scan", "Bulk Scan", "Intel Report", "Chrome Extension"}:
         page = "About"
         st.session_state.page = "About"
 
@@ -1736,6 +1840,7 @@ with st.sidebar:
         ("🔗", "URL Scan"),
         ("📊", "Bulk Scan"),
         ("🔎", "Intel Report"),
+        ("🔌", "Chrome Extension"),
     ]
 
     for icon, label in nav_items:
@@ -2535,6 +2640,9 @@ elif page == "Intel Report":
             <div class="subvalue">System Ready</div>
         </div>
         """, unsafe_allow_html=True)
+
+elif page == "Chrome Extension":
+    _render_chrome_extension_page()
 
 else:
     _render_about_landing()
