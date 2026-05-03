@@ -34,6 +34,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+NAVBAR_HEIGHT = "3.5rem"
+SIDEBAR_WIDTH = "21rem"
+
 # ══════════════════════════════════════════════════════════════
 # 2. New NAny Blue theme
 # ══════════════════════════════════════════════════════════════
@@ -41,12 +44,21 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+:root {
+    --phishvision-navbar-height: 3.5rem;
+    --phishvision-sidebar-width: 21rem;
+    --phishvision-sidebar-width-collapsed: 4.75rem;
+}
+
 html, body, [data-testid="stAppViewContainer"] {
     background-color: #0a0e14 !important;
     color: #e2e8f0 !important;
     font-family: 'Inter', sans-serif !important;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
 }
-[data-testid="stHeader"] { background-color: #0a0e14 !important; border-bottom: 1px solid #142033 !important; }
+
+[data-testid="stHeader"] { background-color: #0a0e14 !important; border-bottom: 1px solid #142033 !important; z-index: 100 !important; }
 [data-testid="stSidebar"] {
     background: #0a0e14 !important;
     border-right: 1px solid #142033 !important;
@@ -54,17 +66,280 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 [data-testid="stSidebar"] * { color: #94a3b8 !important; }
 
+.phishvision-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--phishvision-navbar-height);
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 130px 0 24px;
+    z-index: 1100;
+    box-sizing: border-box;
+}
+.phishvision-navbar-logo {
+    margin-right: auto;
+}
+.phishvision-navbar-divider {
+    width: 1px;
+    height: 20px;
+    background: #1e293b;
+    margin-right: 20px;
+}
+.phishvision-navbar-profile-panel {
+    position: absolute;
+    right: 0;
+    top: 38px;
+    min-width: 210px;
+    background: #0b1428;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(2,6,23,0.45);
+    padding: 8px 0;
+    z-index: 2000;
+}
+.phishvision-navbar-spacer {
+    height: 0;
+}
+
 /* Keep sidebar fixed and disable resize handle */
 section[data-testid="stSidebar"] {
-    width: 21rem !important;
-    min-width: 21rem !important;
-    max-width: 21rem !important;
+    position: fixed !important;
+    top: var(--phishvision-navbar-height) !important;
+    left: 0 !important;
+    width: var(--phishvision-sidebar-width-collapsed) !important;
+    min-width: var(--phishvision-sidebar-width-collapsed) !important;
+    max-width: var(--phishvision-sidebar-width-collapsed) !important;
+    height: calc(100vh - var(--phishvision-navbar-height)) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    transition: width 220ms ease, min-width 220ms ease, max-width 220ms ease, box-shadow 220ms ease !important;
+    z-index: 900 !important;
+}
+section[data-testid="stSidebar"]:hover {
+    width: var(--phishvision-sidebar-width) !important;
+    min-width: var(--phishvision-sidebar-width) !important;
+    max-width: var(--phishvision-sidebar-width) !important;
+    overflow-x: visible !important;
+    box-shadow: 10px 0 24px rgba(0, 0, 0, 0.16) !important;
 }
 section[data-testid="stSidebar"] > div {
-    width: 21rem !important;
-    min-width: 21rem !important;
-    max-width: 21rem !important;
-    margin-top: -8px !important;
+    width: var(--phishvision-sidebar-width) !important;
+    min-width: var(--phishvision-sidebar-width) !important;
+    max-width: var(--phishvision-sidebar-width) !important;
+    height: 100% !important;
+    margin-top: 0 !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    padding: 20px 18px !important;
+}
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+    height: 100% !important;
+}
+/* Collapsed sidebar: icon-only mode */
+section[data-testid="stSidebar"]:not(:hover) .stButton > button {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 0 !important;
+    overflow: visible !important;
+    min-height: 40px !important;
+    text-align: center !important;
+}
+section[data-testid="stSidebar"]:not(:hover) .stButton > button p,
+section[data-testid="stSidebar"]:not(:hover) .stButton > button span {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover) .stButton > button::before {
+    content: '' !important;
+    position: static !important;
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+    color: #94a3b8 !important;
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_URL-Scan .stButton > button::before { content: "🔗" !important; }
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Bulk-Scan .stButton > button::before { content: "📊" !important; }
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Intel-Report .stButton > button::before { content: "🔎" !important; }
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Chrome-Extension .stButton > button::before { content: "🔌" !important; }
+/* Collapsed: Active (non-About) items as divs - show icon via ::before */
+section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 9px 0 !important;
+    min-height: 40px !important;
+    border-radius: 6px !important;
+    margin: 1px 0 !important;
+    gap: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] span {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"]::before {
+    content: "🏠" !important;
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    color: #94a3b8 !important;
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+}
+/* Active item icons - show appropriate icon for each nav item */
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_URL-Scan div[style*="rgb(30, 41, 59)"]::before { content: "🔗" !important; }
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Bulk-Scan div[style*="rgb(30, 41, 59)"]::before { content: "📊" !important; }
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Intel-Report div[style*="rgb(30, 41, 59)"]::before { content: "🔎" !important; }
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Chrome-Extension div[style*="rgb(30, 41, 59)"]::before { content: "🔌" !important; }
+/* Collapsed About item (active state) - use existing span structure */
+section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 0 !important;
+    min-height: 40px !important;
+    border-radius: 6px !important;
+}
+section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] span:first-child {
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] span:last-child {
+    display: none !important;
+}
+/* Expanded sidebar: show labels, hide pseudo-element icons */
+section[data-testid="stSidebar"]:hover .stButton > button {
+    padding: 8px 12px !important;
+}
+section[data-testid="stSidebar"]:hover .stButton > button p,
+section[data-testid="stSidebar"]:hover .stButton > button span {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+section[data-testid="stSidebar"]:hover .stButton > button::before {
+    content: none !important;
+    display: none !important;
+}
+/* Expanded: Active items (divs) - show both icon and label */
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 8px 12px !important;
+    min-height: 40px !important;
+    border-radius: 6px !important;
+    margin: 1px 0 !important;
+    gap: 0 !important;
+}
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:first-child {
+    display: inline !important;
+    font-size: 1.2rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
+}
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:last-child {
+    display: inline !important;
+    margin-left: 0 !important;
+}
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"]::before {
+    content: none !important;
+    display: none !important;
+}
+/* Expanded: Active About button (if structured as button) */
+section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] {
+    padding: 8px 12px !important;
+}
+section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] span {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] span:last-child {
+    display: inline !important;
+    margin-left: 10px !important;
+}
+/* ── Main content area: push right of collapsed sidebar ── */
+[data-testid="stAppViewContainer"] section.main,
+section.main {
+    margin-left: var(--phishvision-sidebar-width-collapsed) !important;
+    margin-right: 0 !important;
+    width: calc(100vw - var(--phishvision-sidebar-width-collapsed)) !important;
+    max-width: calc(100vw - var(--phishvision-sidebar-width-collapsed)) !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+[data-testid="stAppViewContainer"] section.main > div,
+section.main > div {
+    box-sizing: border-box !important;
+    padding-top: 0 !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+}
+
+[data-testid="stMainBlockContainer"],
+[data-testid="stAppViewBlockContainer"] {
+    box-sizing: border-box !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+}
+@media (max-width: 1100px) {
+    :root {
+        --phishvision-sidebar-width-collapsed: 4.5rem;
+        --phishvision-sidebar-width: 18rem;
+    }
+    [data-testid="stAppViewContainer"] section.main,
+    section.main {
+        margin-left: var(--phishvision-sidebar-width-collapsed) !important;
+        width: calc(100vw - var(--phishvision-sidebar-width-collapsed)) !important;
+        max-width: calc(100vw - var(--phishvision-sidebar-width-collapsed)) !important;
+    }
+            
+    [data-testid="stAppViewContainer"] section.main > div,
+    section.main > div,
+    [data-testid="stMainBlockContainer"],
+    [data-testid="stAppViewBlockContainer"] {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
 }
 [data-testid="stSidebarResizer"] {
     display: none !important;
@@ -808,8 +1083,8 @@ button { transition: background 0.2s ease !important; cursor: pointer !important
 [data-testid="stSidebar"] .stButton > button:hover {
     background: #1e293b !important;
     color: #e2e8f0 !important;
-    padding-left: 18px !important;   /* subtle slide-right nudge */
-    box-shadow: none !important;
+    padding-left: 12px !important;
+    box-shadow: inset 3px 0 0 #3b82f6 !important;
     transform: none !important;
 }
 
@@ -1018,11 +1293,27 @@ def _render_about_landing():
             background: transparent;
             color: var(--text);
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden !important;
+            max-width: 100% !important;
         }}
         .landing-page {{
             width: 100%;
             box-sizing: border-box;
             color: var(--text);
+            padding-left: 84px;
+            padding-right: 8px;
+        }}
+        
+        /* Ensure top-level landing content clears the fixed sidebar */
+        .landing-page,
+        .landing-grid,
+        .feature-grid,
+        .landing-divider {{
+            margin-left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
         }}
         .landing-hero {{
             position: relative;
@@ -1253,7 +1544,42 @@ def _render_about_landing():
     </style>
 
     <div class="landing-page">
-        <section class="landing-hero" data-reveal>
+    <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; margin-bottom:20px;">
+        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,0.18);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🛡️</div>
+            <div>
+                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">Threats Detected Today</div>
+                <div style="color:#f7fbff;font-size:1.5rem;font-weight:700;line-height:1;">1,248</div>
+                <div style="color:#22c55e;font-size:0.72rem;margin-top:3px;">▲ 18.6% vs yesterday</div>
+            </div>
+        </div>
+        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,212,255,0.12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🌐</div>
+            <div>
+                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">URLs Scanned</div>
+                <div style="color:#f7fbff;font-size:1.5rem;font-weight:700;line-height:1;">24,532</div>
+                <div style="color:#22c55e;font-size:0.72rem;margin-top:3px;">▲ 23.4% vs yesterday</div>
+            </div>
+        </div>
+        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:48px;height:48px;border-radius:12px;background:rgba(168,85,247,0.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🎯</div>
+            <div>
+                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">Detection Accuracy</div>
+                <div style="color:#f7fbff;font-size:1.5rem;font-weight:700;line-height:1;">99.2%</div>
+                <div style="color:#22c55e;font-size:0.72rem;margin-top:3px;">▲ 2.1% vs yesterday</div>
+            </div>
+        </div>
+        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
+            <div style="width:48px;height:48px;border-radius:12px;background:rgba(34,197,94,0.12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">💊</div>
+            <div style="flex:1;">
+                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">System Health</div>
+                <div style="color:#22c55e;font-size:1.3rem;font-weight:700;line-height:1;">Excellent</div>
+                <div style="color:rgba(219,232,245,0.55);font-size:0.72rem;margin-top:3px;">All systems operational</div>
+            </div>
+            <div style="width:44px;height:44px;border-radius:50%;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;color:#22c55e;font-size:0.7rem;font-weight:700;">100%</div>
+        </div>
+    </div>
+    <section class="landing-hero" data-reveal>
             <div class="landing-hero-grid">
                 <div>
                     <div class="landing-kicker">Detect. Protect. Stay Secure.</div>
@@ -1342,7 +1668,7 @@ def _render_about_landing():
     </script>
     """
 
-    components.html(html, height=2200, scrolling=False)
+    components.html(html, height=1800, scrolling=False, width=None)
 
 
 def _render_chrome_extension_page():
@@ -1778,25 +2104,20 @@ if st.session_state.show_settings:
 show_auth_modal(st.session_state.get("auth_view", "login"))
 
 
-# ══════════════════════════════════════════════════════════════
-# 4. SIDEBAR
-# ══════════════════════════════════════════════════════════════
-with st.sidebar:
-    authenticated = st.session_state.get("authenticated", False)
-    profile_name = st.session_state.get("user_name") or st.session_state.get("user_email", "User")
-    profile_email = st.session_state.get("user_email", "")
-    settings_href = f"?menu=settings&ue={quote(profile_email)}" if profile_email else "?menu=settings"
-    login_href = "?menu=login"
-    signup_href = "?menu=signup"
-    name_parts = str(profile_name).strip().split()
-    profile_initials = "".join(p[0] for p in name_parts[:2]).upper() if name_parts else "U"
-    logo_uri = _image_to_data_uri("logo.png")
-    logo_markup = f'<img src="{logo_uri}" style="width:150px; max-width:150px; display:block;" />' if logo_uri else ''
+authenticated = st.session_state.get("authenticated", False)
+profile_name = st.session_state.get("user_name") or st.session_state.get("user_email", "User")
+profile_email = st.session_state.get("user_email", "")
+settings_href = f"?menu=settings&ue={quote(profile_email)}" if profile_email else "?menu=settings"
+login_href = "?menu=login"
+signup_href = "?menu=signup"
+name_parts = str(profile_name).strip().split()
+profile_initials = "".join(p[0] for p in name_parts[:2]).upper() if name_parts else "U"
+logo_uri = _image_to_data_uri("logo.png")
+logo_markup = f'<img src="{logo_uri}" style="width:150px; max-width:150px; display:block;" />' if logo_uri else ''
 
-    # ── TOP NAVBAR ── (runs once at top level, never inside a function)
-    st.markdown(f"""
-<div style="position:fixed;top:0;right:0;width:calc(100% - 21rem);height:3.5rem;background:#0f172a;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:flex-end;padding:0 130px 0 24px;z-index:999;box-sizing:border-box;">
-    <div style="margin-right:auto;">
+st.markdown(f"""
+<div class="phishvision-navbar">
+    <div class="phishvision-navbar-logo">
         {logo_markup}
     </div>
     <div style="display:flex;align-items:center;gap:6px;margin-right:20px;">
@@ -1804,7 +2125,7 @@ with st.sidebar:
         <span style="font-family:Inter,sans-serif;font-size:0.78rem;color:#94a3b8;">API Status</span>
         <span style="font-family:Inter,sans-serif;font-size:0.78rem;color:#22c55e;font-weight:600;">Online</span>
     </div>
-    <div style="width:1px;height:20px;background:#1e293b;margin-right:20px;"></div>
+    <div class="phishvision-navbar-divider"></div>
     <button id="phishvision-news-bell" type="button" title="Cyber Threat News Notifications" aria-label="Cyber Threat News Notifications" style="appearance:none;background:transparent;border:none;color:#e2e8f0;font-size:1.1rem;cursor:pointer;margin-right:16px;padding:0;line-height:1;">🔔</button>
     <details style="position:relative; margin:0;">
         <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -1812,17 +2133,95 @@ with st.sidebar:
             <div style="font-family:Inter,sans-serif;font-size:0.8rem;font-weight:600;color:#e2e8f0;">{profile_name}</div>
             <div style="font-size:0.7rem;color:#94a3b8;">▼</div>
         </summary>
-        <div style="position:absolute;right:0;top:38px;min-width:210px;background:#0b1428;border:1px solid #1e293b;border-radius:10px;box-shadow:0 10px 24px rgba(2,6,23,0.45);padding:8px 0;z-index:2000;">
+        <div class="phishvision-navbar-profile-panel">
             <a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a>
             {'<a href="'+login_href+'" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">👤 Login</a><a href="'+signup_href+'" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">✨ Sign Up</a>' if not authenticated else '<a href="?menu=logout" target="_self" style="display:block;padding:10px 12px;color:#ff8f8f;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⎋ Logout</a>'}
         </div>
     </details>
 </div>
-<div style="height:3.5rem;"></div>
 """, unsafe_allow_html=True)
 
-    render_cyber_news_notifications()
+st.markdown("<div class='phishvision-navbar-spacer'></div>", unsafe_allow_html=True)
 
+components.html("""
+<script>
+document.addEventListener('click', function(e) {
+    const details = window.parent.document.querySelector('.phishvision-navbar details');
+    if (details && !details.contains(e.target) && !window.parent.document.querySelector('.phishvision-navbar').contains(e.target)) {
+        details.removeAttribute('open');
+    }
+});
+window.parent.document.addEventListener('click', function(e) {
+    const details = window.parent.document.querySelector('.phishvision-navbar details');
+    if (details && !details.contains(e.target)) {
+        details.removeAttribute('open');
+    }
+});
+</script>
+""", height=0, width=0)
+
+components.html(
+    """
+    <script>
+    (function() {
+        const collapsed = '4.75rem';
+        const expanded = '21rem';
+
+        function bindSidebarHover() {
+            const sidebar = window.parent && window.parent.document
+                ? window.parent.document.querySelector('section[data-testid="stSidebar"]')
+                : null;
+
+            if (!sidebar || sidebar.dataset.phishvisionHoverBound === 'true') {
+                return !!sidebar;
+            }
+
+            sidebar.dataset.phishvisionHoverBound = 'true';
+
+            const setCollapsed = () => {
+                sidebar.style.width = collapsed;
+                sidebar.style.minWidth = collapsed;
+                sidebar.style.maxWidth = collapsed;
+                sidebar.style.overflowX = 'hidden';
+            };
+
+            const setExpanded = () => {
+                sidebar.style.width = expanded;
+                sidebar.style.minWidth = expanded;
+                sidebar.style.maxWidth = expanded;
+                sidebar.style.overflowX = 'visible';
+            };
+
+            setCollapsed();
+            sidebar.addEventListener('mouseenter', setExpanded);
+            sidebar.addEventListener('mouseleave', setCollapsed);
+            return true;
+        }
+
+        const timer = window.setInterval(() => {
+            try {
+                if (bindSidebarHover()) {
+                    window.clearInterval(timer);
+                }
+            } catch (error) {
+            }
+        }, 250);
+
+        window.setTimeout(() => window.clearInterval(timer), 5000);
+    })();
+    </script>
+    """,
+    height=0,
+    width=0,
+)
+
+render_cyber_news_notifications()
+
+
+# ══════════════════════════════════════════════════════════════
+# 4. SIDEBAR
+# ══════════════════════════════════════════════════════════════
+with st.sidebar:
     # ── Initialize session state ──
     if 'page' not in st.session_state:
         st.session_state.page = "About"
@@ -1836,7 +2235,7 @@ with st.sidebar:
 
     # ── Navigation Items ──
     nav_items = [
-        ("ℹ️", "About"),
+        ("🏠", "About"),
         ("🔗", "URL Scan"),
         ("📊", "Bulk Scan"),
         ("🔎", "Intel Report"),
@@ -1848,15 +2247,16 @@ with st.sidebar:
 
         if is_active:
             # Active item rendered as styled HTML (not a button)
-            st.markdown(f"""
-            <div style="background:#1e293b; border-radius:6px; padding:9px 12px;
-                        margin:1px 0; display:flex; align-items:center; gap:10px;
-                        cursor:default;">
-                <span style="font-size:1rem; line-height:1;">{icon}</span>
-                <span style="font-family:'Inter',sans-serif; font-size:0.875rem;
-                             font-weight:600; color:#e2e8f0;">{label}</span>
-            </div>
-            """, unsafe_allow_html=True)
+           st.markdown(f"""
+            <div style="background:#1e293b; box-shadow: inset 3px 0 0 #3b82f6;
+                border-radius:6px; padding:8px 12px;
+                       margin:1px 0; display:flex; align-items:center; gap:10px;
+                       cursor:default; height:38px; box-sizing:border-box;">
+               <span style="font-size:1rem; line-height:1; flex-shrink:0;">{icon}</span>
+               <span style="font-family:'Inter',sans-serif; font-size:0.875rem;
+                            font-weight:500; color:#e2e8f0; white-space:nowrap;">{label}</span>
+           </div>
+           """, unsafe_allow_html=True)
         else:
             # Inactive item is a clickable button styled as nav item
             if st.button(
@@ -1991,7 +2391,7 @@ current_model = load_selected_model(model_choice)
 # ══════════════════════════════════════════════════════════════
 # 7. SECTION RENDERING
 # ══════════════════════════════════════════════════════════════
-st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 
 if page == "URL Scan":
     section_title("Target URL Analysis", "Enter URL for deep inspection")
