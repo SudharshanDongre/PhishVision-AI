@@ -106,6 +106,7 @@ html, body, [data-testid="stAppViewContainer"] {
     height: 0;
 }
 
+            
 /* Keep sidebar fixed and disable resize handle */
 section[data-testid="stSidebar"] {
     position: fixed !important;
