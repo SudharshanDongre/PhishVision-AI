@@ -173,10 +173,10 @@ section[data-testid="stSidebar"]:not(:hover) .stButton > button::before {
     padding: 0 !important;
     flex-shrink: 0 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_URL-Scan .stButton > button::before { content: "🔗" !important; }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Bulk-Scan .stButton > button::before { content: "📊" !important; }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Intel-Report .stButton > button::before { content: "🔎" !important; }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Chrome-Extension .stButton > button::before { content: "🔌" !important; }
+section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_URL-Scan > button::before { content: "🔗" !important; font-style:normal; }
+section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_Bulk-Scan > button::before { content: "⊞" !important; font-size:1.3rem !important; }
+section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_Intel-Report > button::before { content: "⌕" !important; font-size:1.5rem !important; }
+section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_Chrome-Extension > button::before { content: "✏" !important; font-size:1.2rem !important; }
 /* Collapsed: Active (non-About) items as divs - show icon via ::before */
 section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] {
     position: relative !important;
@@ -195,7 +195,8 @@ section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] span 
     opacity: 0 !important;
 }
 section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"]::before {
-    content: "🏠" !important;
+    content: "⌂" !important;
+    font-size: 1.4rem !important;
     display: inline-block !important;
     width: auto !important;
     height: auto !important;
@@ -375,6 +376,16 @@ section[data-testid="stSidebar"]:not(:hover) .stButton {
     opacity: 1 !important;
     height: auto !important;
 }
+            
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_URL-Scan,
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Bulk-Scan,
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Intel-Report,
+section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Chrome-Extension {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+            
 section[data-testid="stSidebar"]:not(:hover) .engine-active-indicator {
     display: none !important;
 }
@@ -441,12 +452,37 @@ button[aria-label="Collapse sidebar"] {
 .stTextInput > div > div > input:focus { border: 1px solid #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important; }
 .stTextInput > label { color: #94a3b8 !important; font-size: 0.8rem !important; }
 
-/* Selectbox */
+/* Selectbox - Modern Style */
 .stSelectbox > div > div {
-    background-color: #1e293b !important;
-    border: 1px solid #334155 !important;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
     color: #e2e8f0 !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    font-weight: 500 !important;
+}
+
+/* Selectbox Arrow - Modern Icon */
+.stSelectbox svg {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s ease !important;
+    color: #60a5fa !important;
+}
+
+/* Selectbox Hover - Modern Interactive State */
+.stSelectbox > div > div:hover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Selectbox Hover - Open Arrow */
+.stSelectbox > div > div:hover svg {
+    transform: rotate(180deg) !important;
+    color: #60a5fa !important;
 }
 
 /* Metrics */
@@ -1163,10 +1199,18 @@ button { transition: background 0.2s ease !important; cursor: pointer !important
 }
 
 /* ─── Hover on Detection Engine selectbox section ─── */
+[data-testid="stSidebar"] .stSelectbox > div {
+    cursor: pointer !important;
+}
 [data-testid="stSidebar"] .stSelectbox > div:hover {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59,130,246,0.15) !important;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15), 0 8px 24px rgba(59,130,246,0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Auto-open dropdown on hover */
+[data-testid="stSidebar"] .stSelectbox > div:hover .stSelectbox__option {
+    display: block !important;
 }
 
 /* ─── Hover on Engine Active indicator row ─── */
@@ -2294,33 +2338,33 @@ with st.sidebar:
 
     # ── Navigation Items ──
     nav_items = [
-        ("🏠", "About"),
-        ("🔗", "URL Scan"),
-        ("📊", "Bulk Scan"),
-        ("🔎", "Intel Report"),
-        ("🔌", "Chrome Extension"),
+        ("""<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 22V12h6v10"/></svg>""", "About"),
+        ("""<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>""", "URL Scan"),
+        ("""<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>""", "Bulk Scan"),
+        ("""<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>""", "Intel Report"),
+        ("""<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 00-8.49-8.49L5 10.5V19h8.5l6.74-6.76z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>""", "Chrome Extension"),
     ]
 
     for icon, label in nav_items:
         is_active = (page == label)
 
         if is_active:
-            # Active item rendered as styled HTML (not a button)
-           st.markdown(f"""
+            st.markdown(f"""
             <div style="background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(59,130,246,0.06));
                 border:1px solid rgba(59,130,246,0.3);
                 border-radius:6px; padding:8px 12px;
                 margin:1px 0; display:flex; align-items:center; gap:10px;
-                cursor:default; height:38px; box-sizing:border-box;">
-               <span style="font-size:1rem; line-height:1; flex-shrink:0;">{icon}</span>
-               <span style="font-family:'Inter',sans-serif; font-size:0.875rem;
-                            font-weight:500; color:#e2e8f0; white-space:nowrap;">{label}</span>
-           </div>
-           """, unsafe_allow_html=True)
+                cursor:default; height:38px; box-sizing:border-box;
+                width:100%; margin-left:0; margin-right:0;">
+                <span style="display:flex;align-items:center;color:#e2e8f0;flex-shrink:0;">{icon}</span>
+                <span style="font-family:'Inter',sans-serif; font-size:0.875rem;
+                             font-weight:500; color:#e2e8f0; white-space:nowrap;">{label}</span>
+            </div>
+            """, unsafe_allow_html=True)
         else:
             # Inactive item is a clickable button styled as nav item
             if st.button(
-                f"{icon}   {label}",
+                label,
                 key=f"nav_{label}",
                 use_container_width=True
             ):
@@ -2348,6 +2392,44 @@ with st.sidebar:
         label_visibility="collapsed",
         key="engine_select"
     )
+
+    # Modern dropdown hover-to-open functionality
+    st.markdown("""
+    <script>
+    (function() {
+        function setupSelectboxHover() {
+            const selectboxContainers = document.querySelectorAll('[data-testid="stSidebar"] .stSelectbox');
+            selectboxContainers.forEach(container => {
+                const trigger = container.querySelector('[role="combobox"], button, [aria-haspopup="listbox"]');
+                if (trigger) {
+                    container.addEventListener('mouseenter', function() {
+                        if (!this.classList.contains('hover-opened')) {
+                            trigger.click();
+                            this.classList.add('hover-opened');
+                        }
+                    });
+                    container.addEventListener('mouseleave', function() {
+                        this.classList.remove('hover-opened');
+                    });
+                }
+            });
+        }
+        
+        // Initial setup
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupSelectboxHover);
+        } else {
+            setupSelectboxHover();
+        }
+        
+        // Watch for DOM changes and reinitialize
+        const mutationObserver = new MutationObserver(() => {
+            setTimeout(setupSelectboxHover, 100);
+        });
+        mutationObserver.observe(document.body, { childList: true, subtree: true, attributes: false });
+    })();
+    </script>
+    """, unsafe_allow_html=True)
 
     # Active engine indicator
     st.markdown("""
