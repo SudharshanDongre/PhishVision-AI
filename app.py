@@ -151,6 +151,7 @@ section[data-testid="stSidebar"]:not(:hover) .stButton > button {
     overflow: visible !important;
     min-height: 40px !important;
     text-align: center !important;
+    width: 100% !important;
 }
 section[data-testid="stSidebar"]:not(:hover) .stButton > button p,
 section[data-testid="stSidebar"]:not(:hover) .stButton > button span {
@@ -306,17 +307,22 @@ section.main {
 section.main > div {
     box-sizing: border-box !important;
     padding-top: 0 !important;
-    padding-left: 1.5rem !important;
+    padding-left: calc(var(--phishvision-sidebar-width-collapsed) + 1.5rem) !important;
     padding-right: 1.5rem !important;
     max-width: 100% !important;
     width: 100% !important;
     overflow-x: hidden !important;
 }
+            
+[data-testid="stAppViewContainer"] {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
 
 [data-testid="stMainBlockContainer"],
 [data-testid="stAppViewBlockContainer"] {
     box-sizing: border-box !important;
-    padding-left: 1.5rem !important;
+    padding-left: calc(var(--phishvision-sidebar-width-collapsed) + 1.5rem) !important;
     padding-right: 1.5rem !important;
     max-width: 100% !important;
     width: 100% !important;
@@ -342,6 +348,54 @@ section.main > div {
         padding-right: 1rem !important;
     }
 }
+
+/* Hide selectbox and status panel in collapsed state */
+section[data-testid="stSidebar"]:not(:hover) .stSelectbox,
+section[data-testid="stSidebar"]:not(:hover) .ui-status-panel,
+section[data-testid="stSidebar"]:not(:hover) .ui-inline-note,
+section[data-testid="stSidebar"]:not(:hover) .ui-activity-item,
+section[data-testid="stSidebar"]:not(:hover) .ui-section-subtitle,
+section[data-testid="stSidebar"]:not(:hover) hr,
+section[data-testid="stSidebar"]:not(:hover) div[style*="gap:8px"],
+section[data-testid="stSidebar"]:not(:hover) div[style*="border-top:1px solid #1e293b"],
+section[data-testid="stSidebar"]:not(:hover) [data-testid="stButton"]:last-child {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force all nav buttons visible with icon in collapsed state */
+section[data-testid="stSidebar"]:not(:hover) .stButton {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+}
+section[data-testid="stSidebar"]:not(:hover) .engine-active-indicator {
+    display: none !important;
+}
+/* Also hide the Detection Engine label div */
+section[data-testid="stSidebar"]:not(:hover) div[style*="border-top:1px solid #1e293b"] {
+    display: none !important;
+}
+
+/* Show everything again on hover */
+section[data-testid="stSidebar"]:hover .stSelectbox,
+section[data-testid="stSidebar"]:hover .ui-status-panel,
+section[data-testid="stSidebar"]:hover .ui-inline-note,
+section[data-testid="stSidebar"]:hover .ui-activity-item,
+section[data-testid="stSidebar"]:hover .ui-section-subtitle,
+section[data-testid="stSidebar"]:hover hr,
+section[data-testid="stSidebar"]:hover div[style*="border-top:1px solid #1e293b"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+            
 [data-testid="stSidebarResizer"] {
     display: none !important;
     pointer-events: none !important;
@@ -1082,12 +1136,14 @@ button { transition: background 0.2s ease !important; cursor: pointer !important
 }
 
 [data-testid="stSidebar"] .stButton > button:hover {
-    background: #1e293b !important;
+    background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(59,130,246,0.06)) !important;
+    border: 1px solid rgba(59,130,246,0.3) !important;
     color: #e2e8f0 !important;
     padding-left: 12px !important;
-    box-shadow: inset 3px 0 0 #3b82f6 !important;
+    box-shadow: none !important;
     transform: none !important;
 }
+
 
 [data-testid="stSidebar"] .stButton > button:active {
     background: #273548 !important;
@@ -1291,6 +1347,7 @@ def _render_about_landing():
         }}
         html, body {{
             margin: 0;
+            padding-top: 0
             background: transparent;
             color: var(--text);
             font-family: 'Inter', sans-serif;
@@ -1301,7 +1358,8 @@ def _render_about_landing():
             width: 100%;
             box-sizing: border-box;
             color: var(--text);
-            padding-left: 84px;
+            padding-top: 0;
+            padding-left: 0;
             padding-right: 8px;
         }}
         
@@ -2249,10 +2307,11 @@ with st.sidebar:
         if is_active:
             # Active item rendered as styled HTML (not a button)
            st.markdown(f"""
-            <div style="background:#1e293b; box-shadow: inset 3px 0 0 #3b82f6;
+            <div style="background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(59,130,246,0.06));
+                border:1px solid rgba(59,130,246,0.3);
                 border-radius:6px; padding:8px 12px;
-                       margin:1px 0; display:flex; align-items:center; gap:10px;
-                       cursor:default; height:38px; box-sizing:border-box;">
+                margin:1px 0; display:flex; align-items:center; gap:10px;
+                cursor:default; height:38px; box-sizing:border-box;">
                <span style="font-size:1rem; line-height:1; flex-shrink:0;">{icon}</span>
                <span style="font-family:'Inter',sans-serif; font-size:0.875rem;
                             font-weight:500; color:#e2e8f0; white-space:nowrap;">{label}</span>
@@ -2292,10 +2351,10 @@ with st.sidebar:
 
     # Active engine indicator
     st.markdown("""
-    <div style="display:flex; align-items:center; gap:8px;
-                padding:6px 4px; margin-top:4px;">
+    <div class="engine-active-indicator" style="display:flex; align-items:center; gap:8px;
+            padding:6px 4px; margin-top:4px;">
         <span style="font-family:'Inter',sans-serif; font-size:0.75rem;
-                     color:#64748b;">Engine A</span>
+                 color:#64748b;">Engine A</span>
         <span style="width:8px; height:8px; background:#22c55e;
                      border-radius:50%; display:inline-block;"></span>
         <span style="font-family:'Inter',sans-serif; font-size:0.75rem;
