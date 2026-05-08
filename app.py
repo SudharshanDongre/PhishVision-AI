@@ -121,7 +121,10 @@ section[data-testid="stSidebar"] {
     transition: width 220ms ease, min-width 220ms ease, max-width 220ms ease, box-shadow 220ms ease !important;
     z-index: 900 !important;
 }
-section[data-testid="stSidebar"]:hover {
+section[data-testid="stSidebar"]:hover,
+section[data-testid="stSidebar"]:focus-within,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover),
+section[data-testid="stSidebar"]:has(.stSelectbox:focus) {
     width: var(--phishvision-sidebar-width) !important;
     min-width: var(--phishvision-sidebar-width) !important;
     max-width: var(--phishvision-sidebar-width) !important;
@@ -142,7 +145,7 @@ section[data-testid="stSidebar"] > div {
     height: 100% !important;
 }
 /* Collapsed sidebar: icon-only mode */
-section[data-testid="stSidebar"]:not(:hover) .stButton > button {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button {
     position: relative !important;
     display: flex !important;
     align-items: center !important;
@@ -153,13 +156,13 @@ section[data-testid="stSidebar"]:not(:hover) .stButton > button {
     text-align: center !important;
     width: 100% !important;
 }
-section[data-testid="stSidebar"]:not(:hover) .stButton > button p,
-section[data-testid="stSidebar"]:not(:hover) .stButton > button span {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button p,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button span {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) .stButton > button::before {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button::before {
     content: '' !important;
     position: static !important;
     display: inline-block !important;
@@ -173,12 +176,12 @@ section[data-testid="stSidebar"]:not(:hover) .stButton > button::before {
     padding: 0 !important;
     flex-shrink: 0 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_URL-Scan > button::before { content: "🔗" !important; font-style:normal; }
-section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_Bulk-Scan > button::before { content: "⊞" !important; font-size:1.3rem !important; }
-section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_Intel-Report > button::before { content: "⌕" !important; font-size:1.5rem !important; }
-section[data-testid="stSidebar"]:not(:hover) .stButton.st-key-nav_Chrome-Extension > button::before { content: "✏" !important; font-size:1.2rem !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_URL-Scan > button::before { content: "🔗" !important; font-style:normal; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_Bulk-Scan > button::before { content: "⊞" !important; font-size:1.3rem !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_Intel-Report > button::before { content: "⌕" !important; font-size:1.5rem !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_Chrome-Extension > button::before { content: "✏" !important; font-size:1.2rem !important; }
 /* Collapsed: Active (non-About) items as divs - show icon via ::before */
-section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(30, 41, 59)"] {
     position: relative !important;
     display: flex !important;
     align-items: center !important;
@@ -189,12 +192,12 @@ section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] {
     margin: 1px 0 !important;
     gap: 0 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"] span {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(30, 41, 59)"] span {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"]::before {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(30, 41, 59)"]::before {
     content: "⌂" !important;
     font-size: 1.4rem !important;
     display: inline-block !important;
@@ -208,12 +211,12 @@ section[data-testid="stSidebar"]:not(:hover) div[style*="rgb(30, 41, 59)"]::befo
     flex-shrink: 0 !important;
 }
 /* Active item icons - show appropriate icon for each nav item */
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_URL-Scan div[style*="rgb(30, 41, 59)"]::before { content: "🔗" !important; }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Bulk-Scan div[style*="rgb(30, 41, 59)"]::before { content: "📊" !important; }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Intel-Report div[style*="rgb(30, 41, 59)"]::before { content: "🔎" !important; }
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Chrome-Extension div[style*="rgb(30, 41, 59)"]::before { content: "🔌" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_URL-Scan div[style*="rgb(30, 41, 59)"]::before { content: "🔗" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Bulk-Scan div[style*="rgb(30, 41, 59)"]::before { content: "📊" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Intel-Report div[style*="rgb(30, 41, 59)"]::before { content: "🔎" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Chrome-Extension div[style*="rgb(30, 41, 59)"]::before { content: "🔌" !important; }
 /* Collapsed About item (active state) - use existing span structure */
-section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) button[style*="rgb(30, 41, 59)"] {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -221,35 +224,45 @@ section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] {
     min-height: 40px !important;
     border-radius: 6px !important;
 }
-section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] span {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) button[style*="rgb(30, 41, 59)"] span {
     display: inline !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] span:first-child {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) button[style*="rgb(30, 41, 59)"] span:first-child {
     font-size: 1.2rem !important;
     line-height: 1 !important;
     margin: 0 !important;
 }
-section[data-testid="stSidebar"]:not(:hover) button[style*="rgb(30, 41, 59)"] span:last-child {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) button[style*="rgb(30, 41, 59)"] span:last-child {
     display: none !important;
 }
 /* Expanded sidebar: show labels, hide pseudo-element icons */
-section[data-testid="stSidebar"]:hover .stButton > button {
+section[data-testid="stSidebar"]:hover .stButton > button,
+section[data-testid="stSidebar"]:focus-within .stButton > button,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .stButton > button {
     padding: 8px 12px !important;
 }
 section[data-testid="stSidebar"]:hover .stButton > button p,
-section[data-testid="stSidebar"]:hover .stButton > button span {
+section[data-testid="stSidebar"]:focus-within .stButton > button p,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .stButton > button p,
+section[data-testid="stSidebar"]:hover .stButton > button span,
+section[data-testid="stSidebar"]:focus-within .stButton > button span,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .stButton > button span {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
-section[data-testid="stSidebar"]:hover .stButton > button::before {
+section[data-testid="stSidebar"]:hover .stButton > button::before,
+section[data-testid="stSidebar"]:focus-within .stButton > button::before,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .stButton > button::before {
     content: none !important;
     display: none !important;
 }
 /* Expanded: Active items (divs) - show both icon and label */
-section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] {
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"],
+section[data-testid="stSidebar"]:focus-within div[style*="rgb(30, 41, 59)"],
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) div[style*="rgb(30, 41, 59)"] {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -259,12 +272,16 @@ section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] {
     margin: 1px 0 !important;
     gap: 0 !important;
 }
-section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span {
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span,
+section[data-testid="stSidebar"]:focus-within div[style*="rgb(30, 41, 59)"] span,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) div[style*="rgb(30, 41, 59)"] span {
     display: inline !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
-section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:first-child {
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:first-child,
+section[data-testid="stSidebar"]:focus-within div[style*="rgb(30, 41, 59)"] span:first-child,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) div[style*="rgb(30, 41, 59)"] span:first-child {
     display: inline !important;
     font-size: 1.2rem !important;
     line-height: 1 !important;
@@ -272,24 +289,34 @@ section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:first-
     margin-right: 10px !important;
     flex-shrink: 0 !important;
 }
-section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:last-child {
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"] span:last-child,
+section[data-testid="stSidebar"]:focus-within div[style*="rgb(30, 41, 59)"] span:last-child,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) div[style*="rgb(30, 41, 59)"] span:last-child {
     display: inline !important;
     margin-left: 0 !important;
 }
-section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"]::before {
+section[data-testid="stSidebar"]:hover div[style*="rgb(30, 41, 59)"]::before,
+section[data-testid="stSidebar"]:focus-within div[style*="rgb(30, 41, 59)"]::before,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) div[style*="rgb(30, 41, 59)"]::before {
     content: none !important;
     display: none !important;
 }
 /* Expanded: Active About button (if structured as button) */
-section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] {
+section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"],
+section[data-testid="stSidebar"]:focus-within button[style*="rgb(30, 41, 59)"],
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) button[style*="rgb(30, 41, 59)"] {
     padding: 8px 12px !important;
 }
-section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] span {
+section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] span,
+section[data-testid="stSidebar"]:focus-within button[style*="rgb(30, 41, 59)"] span,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) button[style*="rgb(30, 41, 59)"] span {
     display: inline !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
-section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] span:last-child {
+section[data-testid="stSidebar"]:hover button[style*="rgb(30, 41, 59)"] span:last-child,
+section[data-testid="stSidebar"]:focus-within button[style*="rgb(30, 41, 59)"] span:last-child,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) button[style*="rgb(30, 41, 59)"] span:last-child {
     display: inline !important;
     margin-left: 10px !important;
 }
@@ -350,16 +377,16 @@ section.main > div {
     }
 }
 
-/* Hide selectbox and status panel in collapsed state */
-section[data-testid="stSidebar"]:not(:hover) .stSelectbox,
-section[data-testid="stSidebar"]:not(:hover) .ui-status-panel,
-section[data-testid="stSidebar"]:not(:hover) .ui-inline-note,
-section[data-testid="stSidebar"]:not(:hover) .ui-activity-item,
-section[data-testid="stSidebar"]:not(:hover) .ui-section-subtitle,
-section[data-testid="stSidebar"]:not(:hover) hr,
-section[data-testid="stSidebar"]:not(:hover) div[style*="gap:8px"],
-section[data-testid="stSidebar"]:not(:hover) div[style*="border-top:1px solid #1e293b"],
-section[data-testid="stSidebar"]:not(:hover) [data-testid="stButton"]:last-child {
+/* Hide selectbox and status panel in collapsed state (but keep visible when focused) */
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stSelectbox,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .ui-status-panel,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .ui-inline-note,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .ui-activity-item,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .ui-section-subtitle,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) hr,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="gap:8px"],
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="border-top:1px solid #1e293b"],
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) [data-testid="stButton"]:last-child {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
@@ -370,38 +397,52 @@ section[data-testid="stSidebar"]:not(:hover) [data-testid="stButton"]:last-child
 }
 
 /* Force all nav buttons visible with icon in collapsed state */
-section[data-testid="stSidebar"]:not(:hover) .stButton {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
     height: auto !important;
 }
             
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_URL-Scan,
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Bulk-Scan,
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Intel-Report,
-section[data-testid="stSidebar"]:not(:hover) .st-key-nav_Chrome-Extension {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_URL-Scan,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Bulk-Scan,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Intel-Report,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Chrome-Extension {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
             
-section[data-testid="stSidebar"]:not(:hover) .engine-active-indicator {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .engine-active-indicator {
     display: none !important;
 }
 /* Also hide the Detection Engine label div */
-section[data-testid="stSidebar"]:not(:hover) div[style*="border-top:1px solid #1e293b"] {
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="border-top:1px solid #1e293b"] {
     display: none !important;
 }
 
-/* Show everything again on hover */
+/* Show everything again on hover or when focused / selectbox hovered */
 section[data-testid="stSidebar"]:hover .stSelectbox,
+section[data-testid="stSidebar"]:focus-within .stSelectbox,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .stSelectbox,
 section[data-testid="stSidebar"]:hover .ui-status-panel,
+section[data-testid="stSidebar"]:focus-within .ui-status-panel,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .ui-status-panel,
 section[data-testid="stSidebar"]:hover .ui-inline-note,
+section[data-testid="stSidebar"]:focus-within .ui-inline-note,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .ui-inline-note,
 section[data-testid="stSidebar"]:hover .ui-activity-item,
+section[data-testid="stSidebar"]:focus-within .ui-activity-item,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .ui-activity-item,
 section[data-testid="stSidebar"]:hover .ui-section-subtitle,
+section[data-testid="stSidebar"]:focus-within .ui-section-subtitle,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) .ui-section-subtitle,
 section[data-testid="stSidebar"]:hover hr,
-section[data-testid="stSidebar"]:hover div[style*="border-top:1px solid #1e293b"] {
+section[data-testid="stSidebar"]:focus-within hr,
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) hr,
+section[data-testid="stSidebar"]:hover div[style*="border-top:1px solid #1e293b"],
+section[data-testid="stSidebar"]:focus-within div[style*="border-top:1px solid #1e293b"],
+section[data-testid="stSidebar"]:has(.stSelectbox:hover) div[style*="border-top:1px solid #1e293b"] {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -456,13 +497,43 @@ button[aria-label="Collapse sidebar"] {
 .stSelectbox > div > div {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
     border: 1px solid rgba(59, 130, 246, 0.4) !important;
-    color: #e2e8f0 !important;
     border-radius: 10px !important;
-    padding: 10px 12px !important;
-    font-size: 0.95rem !important;
+    padding: 2px 4px !important; /* FIX: Reduced padding so inner text isn't crushed */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ─── Disable Search/Typing in Selectbox Safely ─── */
+.stSelectbox div[data-baseweb="select"] input {
+    color: transparent !important;          /* Hide the text */
+    text-shadow: 0 0 0 transparent !important; 
+    caret-color: transparent !important;    /* Hide the blinking cursor */
+    cursor: pointer !important;             /* Keep the pointer cursor */
+    /* REMOVED: pointer-events: none; so it can still hold focus! */
+}
+
+/* Force the hand/pointer cursor on all internal layers */
+.stSelectbox,
+.stSelectbox div[data-baseweb="select"],
+.stSelectbox div[data-baseweb="select"] > div,
+.stSelectbox div[data-baseweb="select"] span {
+    cursor: pointer !important;
+}
+            
+/* FIX: Force visibility, correct height, and color for the selected text */
+.stSelectbox div[data-baseweb="select"] span,
+.stSelectbox div[data-baseweb="select"] div {
+    color: #e2e8f0 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.95rem !important;
     font-weight: 500 !important;
+}
+
+/* Ensure inner container maintains height and lets the gradient show through */
+.stSelectbox div[data-baseweb="select"] > div {
+    background-color: transparent !important;
+    border: none !important;
+    min-height: 40px !important;
 }
 
 /* Selectbox Arrow - Modern Icon */
@@ -1647,41 +1718,6 @@ def _render_about_landing():
     </style>
 
     <div class="landing-page">
-    <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; margin-bottom:20px;">
-        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
-            <div style="width:48px;height:48px;border-radius:12px;background:rgba(59,130,246,0.18);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🛡️</div>
-            <div>
-                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">Threats Detected Today</div>
-                <div style="color:#f7fbff;font-size:1.5rem;font-weight:700;line-height:1;">1,248</div>
-                <div style="color:#22c55e;font-size:0.72rem;margin-top:3px;">▲ 18.6% vs yesterday</div>
-            </div>
-        </div>
-        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
-            <div style="width:48px;height:48px;border-radius:12px;background:rgba(0,212,255,0.12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🌐</div>
-            <div>
-                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">URLs Scanned</div>
-                <div style="color:#f7fbff;font-size:1.5rem;font-weight:700;line-height:1;">24,532</div>
-                <div style="color:#22c55e;font-size:0.72rem;margin-top:3px;">▲ 23.4% vs yesterday</div>
-            </div>
-        </div>
-        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
-            <div style="width:48px;height:48px;border-radius:12px;background:rgba(168,85,247,0.14);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🎯</div>
-            <div>
-                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">Detection Accuracy</div>
-                <div style="color:#f7fbff;font-size:1.5rem;font-weight:700;line-height:1;">99.2%</div>
-                <div style="color:#22c55e;font-size:0.72rem;margin-top:3px;">▲ 2.1% vs yesterday</div>
-            </div>
-        </div>
-        <div style="background:linear-gradient(180deg,rgba(12,17,26,0.95),rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 20px; display:flex; align-items:center; gap:14px;">
-            <div style="width:48px;height:48px;border-radius:12px;background:rgba(34,197,94,0.12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">💊</div>
-            <div style="flex:1;">
-                <div style="color:rgba(219,232,245,0.6);font-size:0.75rem;margin-bottom:4px;">System Health</div>
-                <div style="color:#22c55e;font-size:1.3rem;font-weight:700;line-height:1;">Excellent</div>
-                <div style="color:rgba(219,232,245,0.55);font-size:0.72rem;margin-top:3px;">All systems operational</div>
-            </div>
-            <div style="width:44px;height:44px;border-radius:50%;border:3px solid #22c55e;display:flex;align-items:center;justify-content:center;color:#22c55e;font-size:0.7rem;font-weight:700;">100%</div>
-        </div>
-    </div>
     <section class="landing-hero" data-reveal>
             <div class="landing-hero-grid">
                 <div>
@@ -1771,7 +1807,7 @@ def _render_about_landing():
     </script>
     """
 
-    components.html(html, height=1800, scrolling=False, width=None)
+    components.html(html, height=1400, scrolling=False, width=None)
 
 
 def _render_chrome_extension_page():
@@ -2393,43 +2429,112 @@ with st.sidebar:
         key="engine_select"
     )
 
-    # Modern dropdown hover-to-open functionality
-    st.markdown("""
+# Modern dropdown hover-to-open and sidebar-lock functionality
+    components.html("""
     <script>
     (function() {
-        function setupSelectboxHover() {
-            const selectboxContainers = document.querySelectorAll('[data-testid="stSidebar"] .stSelectbox');
-            selectboxContainers.forEach(container => {
-                const trigger = container.querySelector('[role="combobox"], button, [aria-haspopup="listbox"]');
-                if (trigger) {
+        // CSS to forcibly keep the sidebar expanded while the menu is in use
+        const forceExpandCSS = `
+            section[data-testid="stSidebar"] {
+                width: 21rem !important;
+                min-width: 21rem !important;
+                max-width: 21rem !important;
+                overflow-x: visible !important;
+                box-shadow: 10px 0 24px rgba(0, 0, 0, 0.16) !important;
+            }
+            
+            /* Expand unselected buttons */
+            section[data-testid="stSidebar"] .stButton > button { padding: 8px 12px !important; }
+            section[data-testid="stSidebar"] .stButton > button p,
+            section[data-testid="stSidebar"] .stButton > button span { display: block !important; visibility: visible !important; opacity: 1 !important; }
+            section[data-testid="stSidebar"] .stButton > button::before { display: none !important; }
+            
+            /* Expand selected active nav div */
+            section[data-testid="stSidebar"] div[style*="rgb(30, 41, 59)"] { padding: 8px 12px !important; justify-content: flex-start !important; }
+            section[data-testid="stSidebar"] div[style*="rgb(30, 41, 59)"] span { display: inline !important; visibility: visible !important; opacity: 1 !important; }
+            section[data-testid="stSidebar"] div[style*="rgb(30, 41, 59)"]::before { display: none !important; }
+            
+            /* Restore visibility of hidden elements */
+            section[data-testid="stSidebar"] .stSelectbox,
+            section[data-testid="stSidebar"] .ui-status-panel,
+            section[data-testid="stSidebar"] .ui-inline-note,
+            section[data-testid="stSidebar"] .ui-activity-item,
+            section[data-testid="stSidebar"] .ui-section-subtitle,
+            section[data-testid="stSidebar"] hr,
+            section[data-testid="stSidebar"] div[style*="border-top:1px solid #1e293b"],
+            section[data-testid="stSidebar"] .engine-active-indicator {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                height: auto !important;
+            }
+        `;
+
+        let unlockTimer;
+
+        function manageSidebarAndDropdown() {
+            try {
+                const doc = window.parent.document;
+                
+                // 1. Setup the style element for locking the sidebar
+                let styleEl = doc.getElementById('sidebar-lock-style');
+                if (!styleEl) {
+                    styleEl = doc.createElement('style');
+                    styleEl.id = 'sidebar-lock-style';
+                    doc.head.appendChild(styleEl);
+                }
+
+                // 2. Track hover on popovers to lock the sidebar
+                const popovers = doc.querySelectorAll('div[data-baseweb="popover"], ul[role="listbox"]');
+                let isHoveringMenu = false;
+                popovers.forEach(p => {
+                    if (p.matches(':hover')) isHoveringMenu = true;
+                });
+
+                // Apply or remove the lock CSS with a tiny buffer to prevent flickering
+                if (isHoveringMenu) {
+                    clearTimeout(unlockTimer);
+                    if (styleEl.innerHTML === '') styleEl.innerHTML = forceExpandCSS;
+                } else if (styleEl.innerHTML !== '') {
+                    clearTimeout(unlockTimer);
+                    unlockTimer = setTimeout(() => {
+                        // Double check before unlocking just in case the mouse slipped
+                        let stillHovering = false;
+                        doc.querySelectorAll('div[data-baseweb="popover"], ul[role="listbox"]').forEach(p => {
+                            if (p.matches(':hover')) stillHovering = true;
+                        });
+                        if (!stillHovering) styleEl.innerHTML = '';
+                    }, 100);
+                }
+
+                // 3. Dropdown hover-to-open logic
+                const selectboxes = doc.querySelectorAll('[data-testid="stSidebar"] [data-testid="stSelectbox"]');
+                selectboxes.forEach(container => {
+                    if (container.dataset.hoverFixed === 'true') return;
+                    container.dataset.hoverFixed = 'true';
+                    
                     container.addEventListener('mouseenter', function() {
-                        if (!this.classList.contains('hover-opened')) {
-                            trigger.click();
-                            this.classList.add('hover-opened');
+                        const combobox = container.querySelector('[role="combobox"]');
+                        if (combobox && combobox.getAttribute('aria-expanded') !== 'true') {
+                            const input = container.querySelector('input');
+                            if (input) input.focus();
+                            
+                            const control = container.querySelector('div[data-baseweb="select"]');
+                            if (control) {
+                                control.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                                control.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                            }
                         }
                     });
-                    container.addEventListener('mouseleave', function() {
-                        this.classList.remove('hover-opened');
-                    });
-                }
-            });
+                });
+            } catch (error) {}
         }
         
-        // Initial setup
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupSelectboxHover);
-        } else {
-            setupSelectboxHover();
-        }
-        
-        // Watch for DOM changes and reinitialize
-        const mutationObserver = new MutationObserver(() => {
-            setTimeout(setupSelectboxHover, 100);
-        });
-        mutationObserver.observe(document.body, { childList: true, subtree: true, attributes: false });
+        // Run frequently to keep the sidebar locked seamlessly
+        setInterval(manageSidebarAndDropdown, 100);
     })();
     </script>
-    """, unsafe_allow_html=True)
+    """, height=0, width=0)
 
     # Active engine indicator
     st.markdown("""
