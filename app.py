@@ -1906,7 +1906,7 @@ def _verify_password(password, stored_hash):
 # ══════════════════════════════════════════════════════════════
 # BACKEND API CONFIG
 # ══════════════════════════════════════════════════════════════
-BACKEND_URL = os.getenv("BACKEND_URL", "https://phishvision-ai.onrender.com")
+BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
 def _api_register(email, full_name, password):
     """Register user via backend API."""
@@ -2030,17 +2030,6 @@ def _apply_base_styles():
     
     base_css += "</style>"
     st.markdown(base_css, unsafe_allow_html=True)
-
-
-def _handle_google_signin():
-    if hasattr(st, "login"):
-        try:
-            st.login("google")
-            return
-        except Exception:
-            st.info("Google OAuth is not configured yet. Add Google OIDC settings in Streamlit secrets to enable it.")
-    else:
-        st.info("Google sign-in is available in UI. Configure OIDC in Streamlit to enable real Google authentication.")
 
 
 def _close_auth_modal():
@@ -2173,14 +2162,9 @@ def _render_auth_modal_body(auth_view: str):
                 else:
                     st.error(auth_result.get("message", "Invalid credentials. Please try again."))
 
-    col_btn1, col_btn2 = st.columns([1, 1])
-    with col_btn1:
-        if st.button("Hide Access Panel", key="hide_auth_panel", use_container_width=True):
-            _close_auth_modal()
-            st.rerun()
-    with col_btn2:
-        if st.button("Google Sign-in", key="google_signin", use_container_width=True):
-            _handle_google_signin()
+    if st.button("Hide Access Panel", key="hide_auth_panel", use_container_width=True):
+        _close_auth_modal()
+        st.rerun()
 
     st.markdown('</div></div>', unsafe_allow_html=True)
 
@@ -2627,6 +2611,52 @@ def load_selected_model(name):
     except Exception as e:
         st.error(f"Model load error: {e}")
         return None
+
+
+def load_model_importance_snapshot(model_name, model_obj):
+    try:
+        import pickle
+
+        with Path("feature_names.pkl").open("rb") as handle:
+            feature_names = pickle.load(handle)
+
+        def _rank_importances(importance_values):
+            ranked = []
+            if importance_values is None:
+                return ranked
+
+            importance_values = np.asarray(importance_values, dtype=float)
+            total = float(importance_values.sum())
+            if total > 0:
+                importance_values = importance_values / total
+
+            for idx in np.argsort(importance_values)[::-1]:
+                if idx < len(feature_names):
+                    ranked.append({
+                        "feature": str(feature_names[idx]),
+                        "weight": float(importance_values[idx])
+                    })
+            return ranked
+
+        importance = getattr(model_obj, "feature_importances_", None)
+        if importance is not None:
+            return _rank_importances(importance)
+
+        if model_name == "Stacking Ensemble (Strongest)" and hasattr(model_obj, "named_estimators_"):
+            base_importances = []
+            for estimator_name in ("gb", "rf", "xgb"):
+                estimator = model_obj.named_estimators_.get(estimator_name)
+                estimator_importance = getattr(estimator, "feature_importances_", None) if estimator is not None else None
+                if estimator_importance is not None:
+                    base_importances.append(np.asarray(estimator_importance, dtype=float))
+
+            if base_importances:
+                blended_importance = np.mean(base_importances, axis=0)
+                return _rank_importances(blended_importance)
+
+        return []
+    except Exception:
+        return []
 
 current_model = load_selected_model(model_choice)
 
@@ -3099,194 +3129,215 @@ elif page == "Bulk Scan":
 
 
 elif page == "Intel Report":
-    section_title("Intelligence Report", "Feature importance & model performance metrics")
+    section_title("Intelligence Report", f"Current {model_choice} feature importance and model performance snapshot")
 
-    col_feat, col_model = st.columns([3, 2])
+    importance_snapshot = load_model_importance_snapshot(model_choice, current_model)
 
-    with col_feat:
-        section_title("Top Feature Importance Weights")
-        feature_labels = [
-            "SSL State", "URL Length", "Subdomain Count",
-            "Anchor URL", "Hyphens", "Request URL",
-            "IP Presence", "URL Shortener"
-        ]
-        importance_vals = [0.35, 0.20, 0.15, 0.10, 0.08, 0.05, 0.04, 0.03]
+    if not importance_snapshot:
+        st.error("Feature importance data is unavailable for the selected model.")
+    else:
+        top_features = importance_snapshot[:8]
+        total_features = len(importance_snapshot)
+        top_feature = top_features[0]
+        top_feature_label = top_feature["feature"].replace("_", " ")
+        top_feature_weight = top_feature["weight"] * 100
 
-        # FIX: Proper hover template to prevent tooltip from showing at top
-        hover_texts = [f"<b>{label}</b><br>Weight: {val:.3f}" for label, val in zip(feature_labels, importance_vals)]
+        st.markdown(f"""
+        <div style="display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; margin: 2px 0 18px 0;">
+            <div style="background:linear-gradient(180deg, rgba(12,17,26,0.96), rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-left:3px solid #00d4ff; border-radius:18px; padding:16px 18px; box-shadow:0 20px 46px rgba(0,0,0,0.18);">
+                <div style="font-family:'Inter',sans-serif; color:#8adfff; text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem;">Current Model</div>
+                <div style="font-family:'Orbitron',monospace; color:#f7fbff; font-size:1.15rem; margin-top:8px;">{model_choice}</div>
+                <div style="color:rgba(228,236,246,0.78); font-size:0.85rem; margin-top:8px; line-height:1.55;">Feature importance pulled from the selected engine artifact used by the current project.</div>
+            </div>
+            <div style="background:linear-gradient(180deg, rgba(12,17,26,0.96), rgba(6,10,16,0.9)); border:1px solid rgba(0,255,136,0.18); border-left:3px solid #00ff88; border-radius:18px; padding:16px 18px; box-shadow:0 20px 46px rgba(0,0,0,0.18);">
+                <div style="font-family:'Inter',sans-serif; color:#9fffd0; text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem;">Ranked Features</div>
+                <div style="font-family:'Orbitron',monospace; color:#f7fbff; font-size:1.15rem; margin-top:8px;">{total_features}</div>
+                <div style="color:rgba(228,236,246,0.78); font-size:0.85rem; margin-top:8px; line-height:1.55;">Total feature signals available in the current model snapshot.</div>
+            </div>
+            <div style="background:linear-gradient(180deg, rgba(12,17,26,0.96), rgba(6,10,16,0.9)); border:1px solid rgba(0,200,255,0.18); border-left:3px solid #00c8ff; border-radius:18px; padding:16px 18px; box-shadow:0 20px 46px rgba(0,0,0,0.18);">
+                <div style="font-family:'Inter',sans-serif; color:#8adfff; text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem;">Top Signal</div>
+                <div style="font-family:'Orbitron',monospace; color:#f7fbff; font-size:1.15rem; margin-top:8px;">{top_feature_label}</div>
+                <div style="color:rgba(228,236,246,0.78); font-size:0.85rem; margin-top:8px; line-height:1.55;">Relative importance: {top_feature_weight:.1f}%</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        fig_bar = go.Figure(go.Bar(
-            x           = importance_vals,
-            y           = feature_labels,
-            orientation = 'h',
-            marker = dict(
-                color     = importance_vals,
-                colorscale= [[0, '#00c8ff'], [0.5, '#00ffaa'], [1, '#00ff88']],
-                line      = dict(color='#050a0f', width=1)
-            ),
-            text      = [f"{v:.2f}" for v in importance_vals],
-            textfont  = dict(family='Share Tech Mono', color='#050a0f', size=10),
-            textposition = 'inside',
-            hovertemplate = '%{fullData.name}: <b>%{y}</b><br>Weight: %{x:.3f}<extra></extra>',
-            hoverlabel = dict(
-                bgcolor='#071020',
-                bordercolor='#00c8ff',
-                font=dict(color='#00ff88', family='Share Tech Mono', size=12),
-                namelength=-1,
-                align='left'
-            ),
-            name='Feature Importance'
-        ))
-        
-        fig_bar.update_layout(
-            paper_bgcolor = '#050a0f',
-            plot_bgcolor  = '#071020',
-            height        = 360,
-            margin        = dict(l=180, r=30, t=30, b=30),
-            hovermode     = 'y unified',
-            xaxis = dict(
-                color     = 'rgba(0,255,136,0.27)',
-                tickfont  = dict(family='Share Tech Mono', color='rgba(0,255,136,0.4)', size=10),
-                gridcolor = 'rgba(0,255,136,0.07)',
-                title     = dict(text='IMPORTANCE WEIGHT', font=dict(color='#00c8ff', size=10, family='Orbitron'))
-            ),
-            yaxis = dict(
-                color    = 'rgba(0,255,136,0.27)',
-                tickfont = dict(family='Share Tech Mono', color='rgba(0,255,136,0.67)', size=11),
-                automargin = True
-            ),
-            bargap = 0.3
-        )
-        st.plotly_chart(fig_bar, use_container_width=True, config={
-            'displayModeBar': True, 
-            'displaylogo': False,
-            'toImageButtonOptions': {
-                'format': 'png',
-                'filename': 'feature_importance',
-                'height': 360,
-                'width': 600,
-                'scale': 1
+        col_feat, col_model = st.columns([3, 2])
+
+        with col_feat:
+            section_title("Top Feature Importance Weights", f"Current {model_choice} ranking from the 30-feature model")
+
+            feature_labels = [item["feature"].replace("_", " ") for item in top_features]
+            importance_vals = [item["weight"] * 100 for item in top_features]
+
+            fig_bar = go.Figure(go.Bar(
+                x = importance_vals,
+                y = feature_labels,
+                orientation = 'h',
+                marker = dict(
+                    color = importance_vals,
+                    colorscale = [[0, '#00d4ff'], [0.55, '#00ffaa'], [1, '#00ff88']],
+                    line = dict(color='rgba(255,255,255,0.12)', width=1)
+                ),
+                text = [f"{v:.1f}%" for v in importance_vals],
+                textfont = dict(family='Inter', color='#f7fbff', size=11),
+                textposition = 'outside',
+                cliponaxis = False,
+                hovertemplate = '<b>%{y}</b><br>Relative weight: %{x:.1f}%<extra></extra>',
+                name = 'Feature Importance'
+            ))
+
+            fig_bar.update_layout(
+                paper_bgcolor = 'rgba(0,0,0,0)',
+                plot_bgcolor  = 'rgba(255,255,255,0.02)',
+                height        = 420,
+                margin        = dict(l=220, r=36, t=24, b=24),
+                hovermode     = 'y unified',
+                xaxis = dict(
+                    color     = 'rgba(230,238,247,0.72)',
+                    tickfont  = dict(family='Inter', color='rgba(230,238,247,0.68)', size=10),
+                    gridcolor = 'rgba(0,212,255,0.08)',
+                    zeroline  = False,
+                    title     = dict(text='RELATIVE IMPORTANCE (%)', font=dict(color='#8adfff', size=10, family='Inter')),
+                    rangemode = 'tozero'
+                ),
+                yaxis = dict(
+                    color    = 'rgba(230,238,247,0.72)',
+                    tickfont = dict(family='Inter', color='#dfeaf6', size=11),
+                    automargin = True
+                ),
+                bargap = 0.32,
+                showlegend = False
+            )
+
+            st.plotly_chart(fig_bar, use_container_width=True, config={
+                'displayModeBar': True,
+                'displaylogo': False,
+                'toImageButtonOptions': {
+                    'format': 'png',
+                    'filename': 'feature_importance',
+                    'height': 420,
+                    'width': 640,
+                    'scale': 1
+                }
+            })
+
+        with col_model:
+            section_title("Model Performance", "Current comparison across saved detectors")
+            models_data = {
+                "Model":    ["Stacking Ensemble (Strongest)", "Gradient Boosting", "XGBoost", "Random Forest"],
+                "Accuracy": ["98.1%", "97.3%", "96.8%", "95.9%"],
+                "Speed":    ["Fast", "Fast", "Fastest", "Moderate"],
+                "Type":     ["Ensemble", "Boosting", "Opt. Boost", "Bagging"]
             }
+            selected_model_key = "".join(ch for ch in model_choice.lower() if ch.isalnum())
+            for i in range(len(models_data["Model"])):
+                model_key = "".join(ch for ch in models_data["Model"][i].lower() if ch.isalnum())
+                active = "▶ " if model_key == selected_model_key else "  "
+                color  = "#00ff88" if active.strip() else "rgba(138,223,255,0.55)"
+                st.markdown(f"""
+                <div style="background:linear-gradient(180deg, rgba(12,17,26,0.95), rgba(6,10,16,0.9)); border:1px solid {color}33; border-left:3px solid {color}; border-radius:16px; padding:14px 16px; margin-bottom:10px; box-shadow:0 16px 36px rgba(0,0,0,0.14);">
+                    <div style="font-family:'Inter',sans-serif; color:{color}; font-weight:800; font-size:0.82rem; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px;">{active}{models_data['Model'][i]}</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:0.76rem; line-height:1.45; color:rgba(228,236,246,0.82);">
+                        <span><span style="color:#8adfff;">ACCURACY:</span> <strong style="color:{color};">{models_data['Accuracy'][i]}</strong></span>
+                        <span><span style="color:#8adfff;">SPEED:</span> <strong style="color:{color};">{models_data['Speed'][i]}</strong></span>
+                    </div>
+                    <div style="margin-top:8px; color:rgba(138,223,255,0.45); font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase;">Type: {models_data['Type'][i]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown("<div style='height:4px;'></div>", unsafe_allow_html=True)
+        # Feature category breakdown radar
+        section_title("Feature Category Coverage", "Implementation coverage across the current signal groups")
+        categories   = ['URL Structure', 'Security', 'Domain Intel', 'Content Signals', 'Heuristics']
+        implemented  = [12, 4, 6, 3, 5]
+        total_each   = [12, 4, 8, 8, 8]
+
+        fig_radar = go.Figure()
+        fig_radar.add_trace(go.Scatterpolar(
+            r           = total_each,
+            theta       = categories,
+            fill        = 'toself',
+            name        = 'Total Features',
+            line        = dict(color='rgba(0,212,255,0.22)', width=1.5),
+            fillcolor   = 'rgba(0,212,255,0.06)',
+            hoverinfo   = 'skip'
+        ))
+        fig_radar.add_trace(go.Scatterpolar(
+            r           = implemented,
+            theta       = categories,
+            fill        = 'toself',
+            name        = 'Implemented',
+            line        = dict(color='#00ff88', width=2.5),
+            fillcolor   = 'rgba(0,255,136,0.12)',
+            hovertemplate = '<b>%{theta}</b><br>Implemented: %{r}<extra></extra>'
+        ))
+        fig_radar.update_layout(
+            polar = dict(
+                bgcolor    = 'rgba(255,255,255,0.02)',
+                radialaxis = dict(
+                    visible   = True,
+                    range     = [0, 14],
+                    tickfont  = dict(color='rgba(230,238,247,0.45)', size=9),
+                    gridcolor = 'rgba(0,212,255,0.08)',
+                    linecolor = 'rgba(0,212,255,0.12)'
+                ),
+                angularaxis = dict(
+                    tickfont  = dict(family='Inter', color='#8adfff', size=10),
+                    linecolor = 'rgba(0,212,255,0.12)',
+                    gridcolor = 'rgba(0,212,255,0.08)'
+                )
+            ),
+            paper_bgcolor = 'rgba(0,0,0,0)',
+            height        = 400,
+            margin        = dict(l=90, r=90, t=80, b=70),
+            legend        = dict(
+                font      = dict(family='Inter', color='rgba(230,238,247,0.72)', size=11),
+                bgcolor   = 'rgba(0,0,0,0)',
+                bordercolor='rgba(0,212,255,0.12)',
+                x         = 0.5,
+                y         = -0.12,
+                xanchor   = 'center',
+                yanchor   = 'top'
+            ),
+            hovermode     = 'closest'
+        )
+        st.plotly_chart(fig_radar, use_container_width=True, config={
+            'displayModeBar': False,
+            'responsive': True
         })
 
-    with col_model:
-        section_title("Model Performance")
-        models_data = {
-            "Model":    ["Gradient Boosting", "XGBoost", "Random Forest"],
-            "Accuracy": ["97.3%", "96.8%", "95.9%"],
-            "Speed":    ["Fast", "Fastest", "Moderate"],
-            "Type":     ["Boosting", "Opt. Boost", "Bagging"]
-        }
-        for i in range(3):
-            active = "▶ " if models_data["Model"][i].lower().replace(" ", "_") in model_choice.lower() else "  "
-            color  = "#00ff88" if active.strip() else "#00ff8866"
-            st.markdown(f"""
-            <div class="ui-mini-card" style="border-left:3px solid {color}; margin-bottom:8px;">
-                <div class="label" style="color:{color};">{active}{models_data['Model'][i].upper()}</div>
-                <div class="value" style="font-size:0.72rem; margin-top:6px;">
-                    <span style="color:#00c8ff88;">ACCURACY:</span>
-                    <span style="color:{color};"> {models_data['Accuracy'][i]}</span>
-                    &nbsp;&nbsp;
-                    <span style="color:#00c8ff88;">SPEED:</span>
-                    <span style="color:{color};"> {models_data['Speed'][i]}</span>
-                </div>
-                <div class="subvalue" style="color:{color}44;">
-                    TYPE: {models_data['Type'][i]}
-                </div>
+        # Coverage details table
+        st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.markdown("""
+            <div style="background:linear-gradient(180deg, rgba(12,17,26,0.95), rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 18px;">
+                <div style="color:#8adfff; text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem;">URL STRUCTURE</div>
+                <div style="font-family:'Orbitron',monospace; color:#00ff88; font-size:1.3rem; margin-top:8px;">12/12</div>
+                <div style="color:rgba(228,236,246,0.72); font-size:0.84rem; margin-top:6px;">100% Coverage</div>
             </div>
             """, unsafe_allow_html=True)
 
-    # Feature category breakdown radar
-    section_title("Feature Category Coverage")
-    categories   = ['URL Structure', 'Security', 'Domain Intel', 'Content Signals', 'Heuristics']
-    implemented  = [12, 4, 6, 3, 5]
-    total_each   = [12, 4, 8, 8, 8]
+        with col2:
+            st.markdown("""
+            <div style="background:linear-gradient(180deg, rgba(12,17,26,0.95), rgba(6,10,16,0.9)); border:1px solid rgba(0,212,255,0.18); border-radius:16px; padding:16px 18px;">
+                <div style="color:#8adfff; text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem;">SECURITY</div>
+                <div style="font-family:'Orbitron',monospace; color:#ffaa00; font-size:1.3rem; margin-top:8px;">4/4</div>
+                <div style="color:rgba(228,236,246,0.72); font-size:0.84rem; margin-top:6px;">100% Coverage</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    fig_radar = go.Figure()
-    fig_radar.add_trace(go.Scatterpolar(
-        r           = total_each,
-        theta       = categories,
-        fill        = 'toself',
-        name        = 'Total Features',
-        line        = dict(color='rgba(0,200,255,0.2)'),
-        fillcolor   = 'rgba(0,200,255,0.07)',
-        hoverinfo   = 'skip'
-    ))
-    fig_radar.add_trace(go.Scatterpolar(
-        r           = implemented,
-        theta       = categories,
-        fill        = 'toself',
-        name        = 'Implemented',
-        line        = dict(color='#00ff88', width=2),
-        fillcolor   = 'rgba(0,255,136,0.13)',
-        hovertemplate = '<b>%{theta}</b><br>Implemented: %{r}<extra></extra>'
-    ))
-    fig_radar.update_layout(
-        polar = dict(
-            bgcolor    = '#071020',
-            radialaxis = dict(
-                visible   = True,
-                range     = [0, 14],
-                tickfont  = dict(color='rgba(0,255,136,0.27)', size=9),
-                gridcolor = 'rgba(0,255,136,0.07)',
-                linecolor = 'rgba(0,255,136,0.13)'
-            ),
-            angularaxis = dict(
-                tickfont  = dict(family='Orbitron', color='#00c8ff', size=10),
-                linecolor = 'rgba(0,255,136,0.13)',
-                gridcolor = 'rgba(0,255,136,0.07)'
-            )
-        ),
-        paper_bgcolor = '#050a0f',
-        height        = 400,
-        margin        = dict(l=100, r=100, t=100, b=80),
-        legend        = dict(
-            font      = dict(family='Share Tech Mono', color='rgba(0,255,136,0.53)', size=11),
-            bgcolor   = 'rgba(0,0,0,0)',
-            bordercolor='rgba(0,255,136,0.13)',
-            x         = 0.5,
-            y         = -0.12,
-            xanchor   = 'center',
-            yanchor   = 'top'
-        ),
-        hovermode     = 'closest'
-    )
-    st.plotly_chart(fig_radar, use_container_width=True, config={
-        'displayModeBar': False, 
-        'responsive': True
-    })
-
-    # Coverage details table
-    st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("""
-        <div class="ui-mini-card">
-            <div class="label">URL STRUCTURE</div>
-            <div class="value" style="color:#00ff88;">12/12</div>
-            <div class="subvalue">100% Coverage</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown("""
-        <div class="ui-mini-card">
-            <div class="label">SECURITY</div>
-            <div class="value" style="color:#ffaa00;">4/4</div>
-            <div class="subvalue">100% Coverage</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        coverage_pct = int(sum(implemented) / sum(total_each) * 100)
-        st.markdown(f"""
-        <div class="ui-mini-card">
-            <div class="label">OVERALL</div>
-            <div class="value" style="color:#00ff88;">{coverage_pct}%</div>
-            <div class="subvalue">System Ready</div>
-        </div>
-        """, unsafe_allow_html=True)
+        with col3:
+            coverage_pct = int(sum(implemented) / sum(total_each) * 100)
+            st.markdown(f"""
+            <div style="background:linear-gradient(180deg, rgba(12,17,26,0.95), rgba(6,10,16,0.9)); border:1px solid rgba(0,255,136,0.18); border-radius:16px; padding:16px 18px;">
+                <div style="color:#9fffd0; text-transform:uppercase; letter-spacing:0.16em; font-size:0.72rem;">OVERALL</div>
+                <div style="font-family:'Orbitron',monospace; color:#00ff88; font-size:1.3rem; margin-top:8px;">{coverage_pct}%</div>
+                <div style="color:rgba(228,236,246,0.72); font-size:0.84rem; margin-top:6px;">System Ready</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 elif page == "Chrome Extension":
     _render_chrome_extension_page()
