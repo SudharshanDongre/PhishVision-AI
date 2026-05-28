@@ -35,6 +35,13 @@ This README describes how to set up, run, and contribute to the project locally.
 
 On Windows, using the included `myenv` virtual environment is possible, but creating a fresh venv is recommended to avoid environment-specific issues.
 
+## Technology Stack & Tools Used
+
+- **Language:** Python 3.10+
+- **Frameworks / Libraries:** Streamlit (UI), scikit-learn, XGBoost, pandas, numpy, joblib
+- **Tools:** Git, virtualenv/venv, Chrome/Edge (for the browser extension), `requirements.txt` for exact dependencies
+- **API:** Minimal API layer implemented in `api.py` (see code for framework choice)
+
 ## Quick start (local)
 
 1. Clone the repository
