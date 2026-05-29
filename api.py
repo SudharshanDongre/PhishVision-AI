@@ -322,18 +322,25 @@ def predict(request: URLRequest):
     final_phishing = is_phishing
     
     # If rule-based flags but ML says safe, consider it suspicious
+    is_suspicious = False
     if is_phishing_by_rules and not is_phishing:
         # Lower confidence if rules disagree with ML
         confidence = max(confidence - 20, 50)
+        is_suspicious = True
         logger.warning(f"   ⚠️  Rules disagree with ML - adjusted confidence to {confidence}%")
     
     # If strong rule-based indicators, override ML
     if is_phishing_by_rules and len(rule_reasons) >= 2:
         final_phishing = True
         confidence = min(confidence + 15, 95)
+        is_suspicious = False
         logger.warning(f"   ⚠️  Multiple rule flags - overriding to PHISHING")
-    
-    verdict = "Phishing" if final_phishing else "Safe"
+
+    # Map final state to a human-friendly verdict string. When rules flagged but
+    # the final decision isn't phishing, surface a 'Suspicious' verdict instead
+    # of calling it fully 'Safe' / 'Legitimate'. Do not change the boolean
+    # `is_phishing`/`is_phishing_by_rules` semantics.
+    verdict = "Phishing" if final_phishing else ("Suspicious" if is_suspicious else "Safe")
     
     # ========================================================================
     # STEP 5: Build Response

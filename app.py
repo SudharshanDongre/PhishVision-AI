@@ -1354,7 +1354,7 @@ def threat_card(title, value, color="#00ff88", icon="🔒"):
     """
 
 
-def result_banner(is_phishing, url, confidence):
+def result_banner(is_phishing, url, confidence, is_suspicious=False):
     if is_phishing:
         color = "#ff4444"
         bg = "#1a0505"
@@ -1363,6 +1363,14 @@ def result_banner(is_phishing, url, confidence):
         status = "PHISHING DETECTED"
         msg = "This URL matches known malicious patterns. Do NOT proceed."
         sub = "THREAT ACTIVE"
+    elif is_suspicious:
+        color = "#ffb84d"
+        bg = "#1a1205"
+        border = "#ffb84d"
+        icon = "!"
+        status = "SUSPICIOUS URL"
+        msg = "Rule-based checks flagged this URL. Proceed with caution and review manually."
+        sub = "REVIEW RECOMMENDED"
     else:
         color = "#00ff88"
         bg = "#050f0a"
@@ -2795,7 +2803,9 @@ if page == "URL Scan":
                 confidence = prob_phishing * 100
 
             # ── Result banner ──
-            result_banner(is_phishing, url_input, confidence)
+            # Show 'Suspicious' when rule-based flags exist but final verdict isn't phishing
+            suspicious_flag = is_phishing_by_rules and not is_phishing
+            result_banner(is_phishing, url_input, confidence, suspicious_flag)
 
             # ── Show rule-based warnings if any ──
             if is_phishing_by_rules and rule_reasons:
@@ -2927,9 +2937,10 @@ if page == "URL Scan":
             st.plotly_chart(fig_heatmap, use_container_width=True)
 
             # ── Log to history ──
+            # Record 'Suspicious' when rules flagged but the final decision is not phishing
             st.session_state.history.append({
                 "URL":     url_input,
-                "Verdict": "Phishing" if is_phishing else "Safe"
+                "Verdict": "Phishing" if is_phishing else ("Suspicious" if (is_phishing_by_rules and not is_phishing) else "Safe")
             })
 
 

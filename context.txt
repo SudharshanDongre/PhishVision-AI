@@ -1,0 +1,324 @@
+PhishVision Project Context
+===========================
+
+Overview
+--------
+PhishVision is a Streamlit-based phishing detection web application with a FastAPI backend, multiple machine-learning models, a rule-based feature extractor, authentication and profile management, a browser extension, and a cyber-themed user interface.
+
+The application is designed to let a user:
+- scan a single URL for phishing risk,
+- run bulk scans from CSV input,
+- inspect intelligence and model metrics,
+- switch between multiple detection engines,
+- use a browser extension to send the current tab to the service,
+- authenticate with a login/signup flow backed by the API.
+
+The project uses a local development setup by default, with the Streamlit frontend talking to the FastAPI backend through `BACKEND_URL`.
+
+Current High-Level Behavior
+---------------------------
+- The main frontend is `app.py`.
+- The backend API is `api.py`.
+- Feature extraction is in `extractor.py`.
+- Model loading and inference helpers are in `model.py`.
+- Authentication UI and helper logic exist in `auth.py` and `auth_ui.py`.
+- The browser extension is in `browser-extension/`.
+- The Intel Report section now uses the selected model for feature importance rather than a fixed XGBoost-only snapshot.
+- The Intel Report no longer shows the removed `Snapshot Note` block.
+- Google Sign-in has been removed from the UI and from the app flow.
+- The Intel Report model-performance cards now highlight by normalized selected model name, not by fragile substring matching.
+- The app defaults to `BACKEND_URL=http://localhost:8000` when no environment variable is set.
+
+Main User Flows
+---------------
+1. About page
+- Acts as the landing page and product overview.
+- Uses the app-wide dark cyberpunk visual language.
+- Presents the product summary, feature highlights, and calls to action.
+- Contains a CTA that can jump to the Intel Report section.
+
+2. URL Scan
+- Lets the user enter one URL and run a phishing prediction.
+- Uses the selected detection engine from the sidebar.
+- Runs rule-based pre-checks plus ML inference.
+- Displays result banners, threat metrics, confidence, and feature-vector analysis.
+
+3. Bulk Scan
+- Lets the user upload a CSV file for mass URL scanning.
+- Produces a results table and summary metrics.
+- Supports threat distribution visualization and scan history handling.
+
+4. Intel Report
+- Shows feature importance and model performance information.
+- Uses the selected model for the importance chart and supporting cards.
+- Includes a feature-coverage radar and summary coverage cards.
+- Uses the current project styling language so it matches the rest of the app.
+
+5. Chrome Extension
+- Provides extension-specific setup and usage guidance.
+- The browser extension can send the active tab URL to the API for scanning.
+
+6. Authentication
+- The app has login/signup/profile-style flows tied to the backend API.
+- Authentication is integrated into the Streamlit app with session state controls.
+- Protected sections require authentication.
+
+Frontend Architecture
+---------------------
+Primary file: `app.py`
+
+`app.py` handles:
+- Streamlit page configuration,
+- global styling,
+- section rendering,
+- sidebar navigation,
+- model selection,
+- auth modal and session state,
+- URL scanning UI,
+- bulk scan UI,
+- Intel Report UI,
+- browser-extension guidance,
+- embedded components and visual behavior.
+
+Important UI patterns in `app.py`:
+- The app uses a fixed top navbar.
+- The sidebar is hover-expandable.
+- The app uses dark backgrounds with cyan and green accents.
+- The Intel Report cards and charts use the same dark palette and neon-style accents.
+- The app uses Plotly charts for feature importance and radar views.
+- The UI is heavily customized via CSS inside the Streamlit app.
+
+Key UI sections in `app.py`:
+- About
+- URL Scan
+- Bulk Scan
+- Intel Report
+- Chrome Extension
+
+Model Selection
+---------------
+The detection engine selector currently exposes four options:
+- Stacking Ensemble (Strongest)
+- Gradient Boosting
+- XGBoost
+- Random Forest
+
+The selected engine is stored in Streamlit session state under `engine_select` and is used by the scan pipeline. The Intel Report also follows the selected engine now.
+
+The current logic in the Intel Report does the following:
+- loads the currently selected model object,
+- extracts feature importance if the model exposes `feature_importances_`,
+- for the stacking ensemble, blends the base estimator importances when needed,
+- normalizes labels so the active model card highlights correctly.
+
+Backend API
+-----------
+Primary file: `api.py`
+
+The backend is a FastAPI application that provides:
+- `/predict` for phishing analysis,
+- authentication endpoints,
+- profile update endpoints,
+- user lookup endpoints.
+
+The API is responsible for:
+- loading saved ML models,
+- loading feature names and training metadata,
+- applying rule-based checks before or alongside ML inference,
+- returning a structured prediction response,
+- managing SQLite-backed user accounts.
+
+API configuration notes:
+- `DATABASE_PATH` is read from the environment and defaults to `./users.db`.
+- CORS origins are configurable through `CORS_ORIGINS`.
+- On startup, the API loads `model_gb.pkl`, `model_xgb.pkl`, `model_rf.pkl`, and `model_stack.pkl` if present.
+- The API also loads `feature_names.pkl` and `training_metadata.pkl` when available.
+- A demo account is created in the SQLite database if it does not already exist.
+
+Authentication System
+---------------------
+The project includes a documented authentication stack.
+
+Files:
+- `auth.py`
+- `auth_ui.py`
+- `api.py`
+
+Auth behavior:
+- Registration uses email, full name, and password.
+- Passwords are hashed before storage.
+- Login uses the backend API.
+- Session state is used in the Streamlit frontend.
+- The UI includes login and signup forms, profile UI, and logout handling.
+- Password strength validation is included in the auth docs and UI.
+
+Important current state:
+- Google Sign-in has been removed.
+- The app now uses the standard login/signup flow only.
+
+Feature Extraction and Rule Logic
+---------------------------------
+Primary files:
+- `extractor.py`
+- `model.py`
+
+`extractor.py` is the main feature extractor for the current model pipeline.
+It provides:
+- URL parsing helpers,
+- rule-based phishing checks,
+- 30 feature extraction matching the training dataset format,
+- feature values in the phishing dataset style of `-1`, `0`, `1`.
+
+The 30 extracted signals include categories such as:
+- URL structure,
+- security-related indicators,
+- domain intelligence,
+- content-based signals,
+- heuristic risk indicators.
+
+`model.py` supports model loading and inference helpers used by the app and backend.
+
+Training and Model Artifacts
+----------------------------
+Relevant files:
+- `train.py`
+- `model_gb.pkl`
+- `model_xgb.pkl`
+- `model_rf.pkl`
+- `model_stack.pkl`
+- `feature_names.pkl`
+- `training_metadata.pkl`
+
+The training pipeline produces multiple saved models and metadata files.
+The current ecosystem uses unified labels where:
+- `0` = Safe
+- `1` = Phishing
+
+Training-related notes from the repo:
+- XGBoost feature importances are available.
+- The stacking classifier is built from base estimators.
+- The project uses saved artifacts rather than retraining on each launch.
+
+Browser Extension
+-----------------
+Folder: `browser-extension/`
+
+Current files:
+- `manifest.json`
+- `popup.html`
+- `popup.js`
+- `content.js`
+
+The extension is a Chrome/Edge-style helper that:
+- reads the current tab URL,
+- sends the URL to the PhishVision API,
+- shows scan results in the popup UI,
+- is intended for quick one-click scanning from the browser.
+
+Current extension details:
+- The manifest uses Manifest V3.
+- The extension has host permissions for local backend use and `<all_urls>`.
+- `popup.js` currently points to the deployed API URL string in the extension code.
+
+Repository Structure
+--------------------
+Important top-level files:
+- `app.py` - main Streamlit frontend
+- `api.py` - backend API server
+- `auth.py` - authentication logic
+- `auth_ui.py` - authentication UI components
+- `extractor.py` - feature extraction and rule checks
+- `model.py` - model inference helpers
+- `news_component.py` - cyber news UI component
+- `train.py` - model training script
+- `README.md` - project overview and setup
+- `AUTHENTICATION.md` - auth documentation
+- `AUTH_GUIDE.md` - auth architecture guide
+- `DEPLOYMENT.md` - deployment guide
+- `PRODUCTION_READY.md` - production notes
+- `IMPLEMENTATION.md` - implementation summary
+- `quickstart` docs and other supporting markdown files
+- `Phishing.csv` - training data sample
+- `test.csv` - test data sample
+- `browser-extension/` - extension source
+- `myenv/` - included local virtual environment
+
+UI Theme and Styling
+--------------------
+The app uses a deliberate cyberpunk/dark aesthetic.
+
+Current style characteristics:
+- dark navy/black backgrounds,
+- cyan and green accent colors,
+- glowing borders and subtle gradients,
+- Inter and Orbitron/Share Tech Mono style language,
+- fixed navbar and hover-expandable sidebar,
+- Plotly charts matching the same theme,
+- custom cards and panels for model and threat data.
+
+The Intel Report section was updated to match this theme more closely, and it now uses the same visual language as the About page and the rest of the app.
+
+Deployment and Environment Notes
+---------------------------------
+Development defaults:
+- Streamlit frontend runs on `http://localhost:8501`.
+- FastAPI backend runs on `http://localhost:8000`.
+- `BACKEND_URL` defaults to `http://localhost:8000` in the current app code.
+
+Production guidance in the docs suggests:
+- moving the database to a persistent location,
+- enabling HTTPS,
+- restricting CORS origins,
+- using reverse proxy or Docker for deployment,
+- separating frontend and backend hosts for production.
+
+Current config and docs mention:
+- `.env` can provide backend and database settings,
+- `CORS_ORIGINS` controls API origin restrictions,
+- `DATABASE_PATH` controls the SQLite file location.
+
+Known Current Project State
+---------------------------
+The following reflect the current codebase state as of this context file:
+- Google Sign-in has been removed.
+- The Intel Report now follows the selected model instead of being locked to XGBoost.
+- The Intel Report model-performance highlighting uses normalized label matching.
+- The `Snapshot Note` panel was removed from the Intel Report UI.
+- The Streamlit helper for Intel importance no longer uses cached unhashable model objects.
+- The backend URL defaults to localhost for development.
+
+Operational Notes
+-----------------
+- The app should be launched with `streamlit run app.py`.
+- The backend API should be available if login/signup or prediction calls are needed.
+- The included `myenv` environment exists, but a fresh environment is usually safer for reproducibility.
+- Since the app is heavily customized, changes should be kept local and UI-specific edits should be made carefully.
+
+Useful File Map
+---------------
+- `app.py` - main UI and page routing
+- `api.py` - backend endpoints
+- `extractor.py` - 30-feature extraction and rule checks
+- `model.py` - ML model utilities
+- `train.py` - training and artifact creation
+- `auth.py` - auth logic
+- `auth_ui.py` - auth screens
+- `browser-extension/manifest.json` - extension manifest
+- `browser-extension/popup.js` - popup logic
+- `README.md` - quick project summary
+- `AUTHENTICATION.md` - auth design and test flows
+- `DEPLOYMENT.md` - deployment reference
+- `PRODUCTION_READY.md` - production checklist
+
+Summary
+-------
+PhishVision is a full phishing detection stack with:
+- Streamlit frontend,
+- FastAPI backend,
+- saved ML models,
+- 30-feature extraction pipeline,
+- auth and session handling,
+- browser extension support,
+- a themed dashboard with scan, bulk scan, and intelligence views.
+
+The current live codebase emphasizes local development, current-model Intel reporting, and a consistent cyber-themed UI across the app.
