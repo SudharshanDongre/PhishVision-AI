@@ -74,6 +74,38 @@ def has_brand_impersonation(domain, path):
                 return True
     return False
 
+
+def has_malformed_domain(domain):
+    """Check for obvious domain structure problems that should be treated as suspicious."""
+    if not domain:
+        return True
+
+    domain = domain.lower().strip()
+
+    # Trailing dots, repeated dots, or empty labels are invalid or suspicious.
+    if domain.endswith('.') or '..' in domain:
+        return True
+
+    labels = domain.split('.')
+    if len(labels) < 2:
+        return True
+
+    for label in labels:
+        if not label:
+            return True
+        if len(label) > 63:
+            return True
+        if label.startswith('-') or label.endswith('-'):
+            return True
+        if not re.fullmatch(r'[a-z0-9-]+', label):
+            return True
+
+    # A top-level label with no alphabetic characters is usually malformed.
+    if not re.search(r'[a-z]', labels[-1]):
+        return True
+
+    return False
+
 # ============================================================================
 # RULE-BASED PRE-CHECKS (Catch obvious phishing)
 # ============================================================================
@@ -84,6 +116,17 @@ def rule_based_check(url, domain, path):
     Returns: (is_definitely_phishing, reason) or (False, None)
     """
     reasons = []
+
+    if has_malformed_domain(domain):
+        reasons.append("MALFORMED_DOMAIN")
+
+    # Rule 0: Domain does not resolve in DNS
+    # This is a suspicious signal for typosquats and abandoned lookalikes.
+    try:
+        if domain and not dns_resolves(domain.split(":")[0]):
+            reasons.append("DNS_RECORD_MISSING")
+    except Exception:
+        reasons.append("DNS_RECORD_UNKNOWN")
     
     # Rule 1: IP address as domain
     ip_pattern = r"^(\d{1,3}\.){3}\d{1,3}$"
@@ -405,7 +448,7 @@ def extract_features(url, debug=True):
     # ========================================================================
     try:
         has_dns = dns_resolves(domain_clean)
-        f25 = 1 if has_dns else -1
+        f25 = 1 if has_dns else 0
     except:
         f25 = 0  # Unknown
     features.append(f25)

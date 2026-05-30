@@ -1952,7 +1952,23 @@ def _api_register(email, full_name, password):
             json={"email": email, "full_name": full_name, "password": password},
             timeout=30
         )
-        return response.json()
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = {"success": False, "message": response.text.strip() or "Registration failed"}
+
+        if response.status_code >= 400 and "message" not in payload:
+            detail = payload.get("detail")
+            if isinstance(detail, list) and detail:
+                first_detail = detail[0]
+                payload["message"] = first_detail.get("msg", "Registration failed")
+            elif isinstance(detail, str):
+                payload["message"] = detail
+            else:
+                payload["message"] = f"Registration failed with status {response.status_code}"
+
+        payload["status_code"] = response.status_code
+        return payload
     except Exception as e:
         return {"success": False, "message": f"Connection error to {BACKEND_URL}: {str(e)}"}
 
@@ -2169,11 +2185,16 @@ def _render_auth_modal_body(auth_view: str):
             else:
                 reg_result = _api_register(email_norm, full_name.strip(), password)
                 if reg_result.get("success"):
-                    st.success("Account created successfully. Please sign in.")
+                    st.session_state.authenticated = True
+                    st.session_state.user_email = email_norm
+                    st.session_state.user_name = full_name.strip()
+                    st.session_state.show_auth_panel = False
                     st.session_state.auth_view = "login"
+                    st.session_state.page = "About"
+                    st.success("Account created successfully. You are now signed in.")
                     st.rerun()
                 else:
-                    st.error(reg_result.get("message", "Registration failed. Please try again."))
+                    st.error(reg_result.get("message", reg_result.get("detail", "Registration failed. Please try again.")))
     else:
         st.markdown('<div class="auth-title">Login</div><div class="auth-sub">Access scanning features with your account.</div>', unsafe_allow_html=True)
         with st.form("login_form", clear_on_submit=False):
@@ -2852,8 +2873,8 @@ if page == "URL Scan":
 
             with col_left:
                 section_title("Threat Metrics")
-                verdict_str = "PHISHING" if is_phishing else "SAFE"
-                threat_color = "#ff4444" if is_phishing else "#00ff88"
+                verdict_str = "PHISHING" if is_phishing else ("SUSPICIOUS" if suspicious_flag else "SAFE")
+                threat_color = "#ff4444" if is_phishing else ("#ffb84d" if suspicious_flag else "#00ff88")
 
                 st.markdown(threat_card("Verdict",     verdict_str,                threat_color, "⚡"), unsafe_allow_html=True)
                 st.markdown(threat_card("Confidence",  f"{confidence:.1f}%",       "#00c8ff",    "📡"), unsafe_allow_html=True)
@@ -2862,11 +2883,11 @@ if page == "URL Scan":
 
                 threat_level = "CRITICAL" if (is_phishing and confidence > 85) else \
                                "HIGH"     if (is_phishing and confidence > 60) else \
-                               "MEDIUM"   if  is_phishing                      else \
+                               "MEDIUM"   if  is_phishing or suspicious_flag else \
                                "NONE"
                 level_color  = "#ff0000" if threat_level == "CRITICAL" else \
                                "#ff6600" if threat_level == "HIGH"     else \
-                               "#ffaa00" if threat_level == "MEDIUM"   else "#00ff88"
+                               "#ffb84d" if threat_level == "MEDIUM"   else "#00ff88"
                 st.markdown(threat_card("Threat Level", threat_level, level_color, "☢"), unsafe_allow_html=True)
 
             with col_right:
