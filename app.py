@@ -1911,10 +1911,38 @@ def _verify_password(password, stored_hash):
     return hmac.compare_digest(check, digest)
 
 
+def _get_backend_url():
+    """Resolve the backend API URL for local and deployed environments."""
+    backend_url = os.getenv("BACKEND_URL")
+
+    if not backend_url:
+        try:
+            backend_url = st.secrets.get("BACKEND_URL")
+        except Exception:
+            backend_url = None
+
+    if not backend_url:
+        try:
+            backend_url = os.getenv("API_BASE_URL")
+        except Exception:
+            backend_url = None
+
+    if not backend_url:
+        try:
+            backend_url = st.secrets.get("API_BASE_URL")
+        except Exception:
+            backend_url = None
+
+    if not backend_url:
+        backend_url = "https://phishvision-ai.onrender.com"
+
+    return backend_url.rstrip("/")
+
+
 # ══════════════════════════════════════════════════════════════
 # BACKEND API CONFIG
 # ══════════════════════════════════════════════════════════════
-BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+BACKEND_URL = _get_backend_url()
 
 def _api_register(email, full_name, password):
     """Register user via backend API."""
@@ -1926,7 +1954,7 @@ def _api_register(email, full_name, password):
         )
         return response.json()
     except Exception as e:
-        return {"success": False, "message": f"Connection error: {str(e)}"}
+        return {"success": False, "message": f"Connection error to {BACKEND_URL}: {str(e)}"}
 
 def _api_login(email, password):
     """Login user via backend API."""
@@ -1938,7 +1966,7 @@ def _api_login(email, password):
         )
         return response.json()
     except Exception as e:
-        return {"success": False, "message": f"Connection error: {str(e)}"}
+        return {"success": False, "message": f"Connection error to {BACKEND_URL}: {str(e)}"}
 
 def _api_update_profile(email, full_name=None, password=None):
     """Update user profile via backend API."""
@@ -1958,7 +1986,7 @@ def _api_update_profile(email, full_name=None, password=None):
         )
         return response.json()
     except Exception as e:
-        return {"success": False, "message": f"Connection error: {str(e)}"}
+        return {"success": False, "message": f"Connection error to {BACKEND_URL}: {str(e)}"}
 
 
 def _api_get_user(email):
