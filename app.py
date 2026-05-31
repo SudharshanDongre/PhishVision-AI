@@ -64,6 +64,35 @@ html, body, [data-testid="stAppViewContainer"] {
     border-right: 1px solid #142033 !important;
     padding-top: 0 !important;
 }
+[data-testid="stSidebar"]::before {
+    content: "›";
+    position: absolute;
+    top: 10px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(96, 165, 250, 0.18);
+    background: rgba(15, 23, 42, 0.82);
+    color: #8adfff;
+    font-size: 1.35rem;
+    line-height: 1;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    opacity: 0.82;
+    pointer-events: none;
+    z-index: 2;
+}
+[data-testid="stSidebar"]:hover::before {
+    opacity: 1;
+    border-color: rgba(96, 165, 250, 0.34);
+    box-shadow: 0 0 18px rgba(0, 212, 255, 0.12);
+}
+[data-testid="stSidebar"]:hover {
+    box-shadow: 10px 0 24px rgba(0, 0, 0, 0.16), 0 0 18px rgba(0, 212, 255, 0.08) !important;
+}
 [data-testid="stSidebar"] * { color: #94a3b8 !important; }
 
 .phishvision-navbar {
@@ -131,6 +160,13 @@ section[data-testid="stSidebar"]:has(.stSelectbox:focus) {
     overflow-x: visible !important;
     box-shadow: 10px 0 24px rgba(0, 0, 0, 0.16) !important;
 }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) > div {
+    width: var(--phishvision-sidebar-width-collapsed) !important;
+    min-width: var(--phishvision-sidebar-width-collapsed) !important;
+    max-width: var(--phishvision-sidebar-width-collapsed) !important;
+    padding: 20px 8px !important;
+    overflow-x: hidden !important;
+}
 section[data-testid="stSidebar"] > div {
     width: var(--phishvision-sidebar-width) !important;
     min-width: var(--phishvision-sidebar-width) !important;
@@ -152,9 +188,16 @@ section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > butt
     justify-content: center !important;
     padding: 8px 0 !important;
     overflow: visible !important;
-    min-height: 40px !important;
+    min-height: 42px !important;
     text-align: center !important;
     width: 100% !important;
+}
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(30, 41, 59)"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
 }
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button p,
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button span {
@@ -162,24 +205,31 @@ section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > butt
     visibility: hidden !important;
     opacity: 0 !important;
 }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button > div {
+    display: none !important;
+}
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton > button::before {
     content: '' !important;
     position: static !important;
-    display: inline-block !important;
-    width: auto !important;
-    height: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
     transform: none !important;
-    color: #94a3b8 !important;
-    font-size: 1.2rem !important;
-    line-height: 1 !important;
+    color: #9fb0c9 !important;
+    font-size: 1.16rem !important;
+    line-height: 1.05 !important;
     margin: 0 !important;
     padding: 0 !important;
     flex-shrink: 0 !important;
+    font-weight: 500 !important;
 }
-section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_URL-Scan > button::before { content: "🔗" !important; font-style:normal; }
-section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_Bulk-Scan > button::before { content: "⊞" !important; font-size:1.3rem !important; }
-section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_Intel-Report > button::before { content: "⌕" !important; font-size:1.5rem !important; }
-section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton.st-key-nav_Chrome-Extension > button::before { content: "✏" !important; font-size:1.2rem !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stElementContainer.st-key-nav_About .stButton > button::before { content: "⌂" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stElementContainer.st-key-nav_URL-Scan .stButton > button::before { content: "⛓" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stElementContainer.st-key-nav_Bulk-Scan .stButton > button::before { content: "⊞" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stElementContainer.st-key-nav_Intel-Report .stButton > button::before { content: "⌕" !important; }
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stElementContainer.st-key-nav_Chrome-Extension .stButton > button::before { content: "✎" !important; }
 /* Collapsed: Active (non-About) items as divs - show icon via ::before */
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(30, 41, 59)"] {
     position: relative !important;
@@ -188,9 +238,18 @@ section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(
     justify-content: center !important;
     padding: 9px 0 !important;
     min-height: 40px !important;
+    width: 100% !important;
     border-radius: 6px !important;
     margin: 1px 0 !important;
     gap: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="linear-gradient(90deg, rgba(59,130,246,0.18)"] {
+    justify-content: center !important;
+    font-size: 0 !important;
+}
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="linear-gradient(90deg, rgba(59,130,246,0.18)"] img,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="linear-gradient(90deg, rgba(59,130,246,0.18)"] svg {
+    font-size: 1.2rem !important;
 }
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) div[style*="rgb(30, 41, 59)"] span {
     display: none !important;
@@ -405,6 +464,7 @@ section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .stButton {
 }
             
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_URL-Scan,
+section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_About,
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Bulk-Scan,
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Intel-Report,
 section[data-testid="stSidebar"]:not(:hover):not(:focus-within) .st-key-nav_Chrome-Extension {
@@ -2422,29 +2482,25 @@ with st.sidebar:
         ("""<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 00-8.49-8.49L5 10.5V19h8.5l6.74-6.76z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>""", "Chrome Extension"),
     ]
 
-    for icon, label in nav_items:
-        is_active = (page == label)
+    active_nav_class = f"st-key-nav_{page.replace(' ', '-')}"
+    st.markdown(f"""
+    <style>
+    [data-testid="stSidebar"] .stElementContainer.{active_nav_class} .stButton > button {{
+        background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(59,130,246,0.06)) !important;
+        border: 1px solid rgba(59,130,246,0.3) !important;
+        color: #e2e8f0 !important;
+        border-radius: 6px !important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
-        if is_active:
-            st.markdown(f"""
-            <div style="background: linear-gradient(90deg, rgba(59,130,246,0.18), rgba(59,130,246,0.06));
-                border:1px solid rgba(59,130,246,0.3);
-                border-radius:6px; padding:8px 12px;
-                margin:1px 0; display:flex; align-items:center; gap:10px;
-                cursor:default; height:38px; box-sizing:border-box;
-                width:100%; margin-left:0; margin-right:0;">
-                <span style="display:flex;align-items:center;color:#e2e8f0;flex-shrink:0;">{icon}</span>
-                <span style="font-family:'Inter',sans-serif; font-size:0.875rem;
-                             font-weight:500; color:#e2e8f0; white-space:nowrap;">{label}</span>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            # Inactive item is a clickable button styled as nav item
-            if st.button(
-                label,
-                key=f"nav_{label}",
-                use_container_width=True
-            ):
+    for _, label in nav_items:
+        if st.button(
+            label,
+            key=f"nav_{label}",
+            use_container_width=True
+        ):
+            if page != label:
                 _navigate_to_page(label)
                 st.rerun()
 
@@ -2474,6 +2530,16 @@ with st.sidebar:
     components.html("""
     <script>
     (function() {
+        try {
+            const doc = window.parent.document;
+            const sidebar = doc.querySelector('section[data-testid="stSidebar"]');
+            if (sidebar) {
+                sidebar.setAttribute('title', 'Navigation Menu');
+                sidebar.setAttribute('aria-label', 'Navigation Menu');
+            }
+        } catch (error) {
+        }
+
         // CSS to forcibly keep the sidebar expanded while the menu is in use
         const forceExpandCSS = `
             section[data-testid="stSidebar"] {
@@ -2516,6 +2582,8 @@ with st.sidebar:
         function manageSidebarAndDropdown() {
             try {
                 const doc = window.parent.document;
+                const sidebar = doc.querySelector('section[data-testid="stSidebar"]');
+                const isCollapsed = sidebar && !sidebar.matches(':hover') && !sidebar.matches(':focus-within');
                 
                 // 1. Setup the style element for locking the sidebar
                 let styleEl = doc.getElementById('sidebar-lock-style');
@@ -2523,6 +2591,61 @@ with st.sidebar:
                     styleEl = doc.createElement('style');
                     styleEl.id = 'sidebar-lock-style';
                     doc.head.appendChild(styleEl);
+                }
+
+                if (isCollapsed) {
+                    const force = (node, property, value) => node && node.style.setProperty(property, value, 'important');
+                    [
+                        { selector: '.stElementContainer.st-key-nav_About', label: 'About' },
+                        { selector: '.stElementContainer.st-key-nav_URL-Scan', label: 'URL Scan' },
+                        { selector: '.stElementContainer.st-key-nav_Bulk-Scan', label: 'Bulk Scan' },
+                        { selector: '.stElementContainer.st-key-nav_Intel-Report', label: 'Intel Report' },
+                        { selector: '.stElementContainer.st-key-nav_Chrome-Extension', label: 'Chrome Extension' }
+                    ].forEach(({ selector, label }) => {
+                        const item = doc.querySelector(selector);
+                        if (!item) return;
+
+                        force(item, 'display', 'block');
+                        force(item, 'visibility', 'visible');
+                        force(item, 'opacity', '1');
+                        force(item, 'width', '100%');
+                        force(item, 'min-width', '0');
+                        force(item, 'height', 'auto');
+                        force(item, 'overflow', 'visible');
+
+                        const buttonWrapper = item.querySelector('.stButton');
+                        if (buttonWrapper) {
+                            force(buttonWrapper, 'display', 'block');
+                            force(buttonWrapper, 'visibility', 'visible');
+                            force(buttonWrapper, 'opacity', '1');
+                            force(buttonWrapper, 'width', '100%');
+                            force(buttonWrapper, 'min-width', '0');
+                            force(buttonWrapper, 'height', 'auto');
+                        }
+
+                        const button = item.querySelector('button');
+                        if (button) {
+                            force(button, 'display', 'flex');
+                            force(button, 'align-items', 'center');
+                            force(button, 'justify-content', 'center');
+                            force(button, 'text-align', 'center');
+                            force(button, 'width', '100%');
+                            force(button, 'min-width', '0');
+                            force(button, 'padding', '8px 0');
+                            force(button, 'visibility', 'visible');
+                            force(button, 'opacity', '1');
+                            button.setAttribute('title', label);
+                        }
+                    });
+
+                    doc.querySelectorAll('section[data-testid="stSidebar"] div[style*="border-top: 1px solid rgb(30, 41, 59)"], section[data-testid="stSidebar"] div[style*="border-top:1px solid rgb(30, 41, 59)"]').forEach((node) => {
+                        force(node, 'display', 'none');
+                        force(node, 'visibility', 'hidden');
+                        force(node, 'height', '0');
+                        force(node, 'margin', '0');
+                        force(node, 'padding', '0');
+                        force(node, 'overflow', 'hidden');
+                    });
                 }
 
                 // 2. Track hover on popovers to lock the sidebar
