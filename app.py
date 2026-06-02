@@ -2089,8 +2089,12 @@ def _init_auth_state():
 
 def _sync_settings_from_query():
     action = st.query_params.get("menu")
-    if action == "settings":
+    if action == "settings" and st.session_state.get("authenticated", False):
         st.session_state.show_settings = True
+        st.query_params.clear()
+    elif action == "settings":
+        st.session_state.auth_view = "login"
+        st.session_state.show_auth_panel = True
         st.query_params.clear()
     elif action == "logout":
         st.session_state.authenticated = False
@@ -2255,12 +2259,27 @@ def _render_auth_modal_body(auth_view: str):
                     st.rerun()
                 else:
                     st.error(reg_result.get("message", reg_result.get("detail", "Registration failed. Please try again.")))
+
+        st.markdown(
+            '''
+            <div style="display:flex;align-items:center;gap:12px;margin:16px 0 10px 0;color:#64748b;font-family:Inter,sans-serif;font-size:0.78rem;">
+                <div style="height:1px;flex:1;background:rgba(148,163,184,0.2);"></div>
+                <div>OR</div>
+                <div style="height:1px;flex:1;background:rgba(148,163,184,0.2);"></div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+        if st.button("Already have an account? Login here", key="auth_go_login", use_container_width=True):
+            st.session_state.auth_view = "login"
+            st.session_state.show_auth_panel = True
+            st.rerun()
     else:
         st.markdown('<div class="auth-title">Login</div><div class="auth-sub">Access scanning features with your account.</div>', unsafe_allow_html=True)
         with st.form("login_form", clear_on_submit=False):
             email = st.text_input("Email", placeholder="name@company.com", key="login_email")
             password = st.text_input("Password", type="password", key="login_password")
-            login_submit = st.form_submit_button("Sign In", use_container_width=True)
+            login_submit = st.form_submit_button("Login", use_container_width=True)
 
         if login_submit:
             if not email.strip() or not password:
@@ -2278,6 +2297,21 @@ def _render_auth_modal_body(auth_view: str):
                     st.rerun()
                 else:
                     st.error(auth_result.get("message", "Invalid credentials. Please try again."))
+
+        st.markdown(
+            '''
+            <div style="display:flex;align-items:center;gap:12px;margin:16px 0 10px 0;color:#64748b;font-family:Inter,sans-serif;font-size:0.78rem;">
+                <div style="height:1px;flex:1;background:rgba(148,163,184,0.2);"></div>
+                <div>OR</div>
+                <div style="height:1px;flex:1;background:rgba(148,163,184,0.2);"></div>
+            </div>
+            ''',
+            unsafe_allow_html=True,
+        )
+        if st.button("Don't have an account? Sign Up for Free", key="auth_go_signup", use_container_width=True):
+            st.session_state.auth_view = "signup"
+            st.session_state.show_auth_panel = True
+            st.rerun()
 
     if st.button("Hide Access Panel", key="hide_auth_panel", use_container_width=True):
         _close_auth_modal()
@@ -2350,6 +2384,10 @@ profile_email = st.session_state.get("user_email", "")
 settings_href = f"?menu=settings&ue={quote(profile_email)}" if profile_email else "?menu=settings"
 login_href = "?menu=login"
 signup_href = "?menu=signup"
+if authenticated:
+    profile_menu_html = f'<a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a><a href="?menu=logout" target="_self" style="display:block;padding:10px 12px;color:#ff8f8f;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⎋ Logout</a>'
+else:
+    profile_menu_html = f'<a href="{login_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">👤 Login</a><a href="{signup_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">✨ Sign Up</a>'
 name_parts = str(profile_name).strip().split()
 profile_initials = "".join(p[0] for p in name_parts[:2]).upper() if name_parts else "U"
 logo_uri = _image_to_data_uri("logo.png")
@@ -2374,8 +2412,7 @@ st.markdown(f"""
             <div style="font-size:0.7rem;color:#94a3b8;">▼</div>
         </summary>
         <div class="phishvision-navbar-profile-panel">
-            <a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a>
-            {'<a href="'+login_href+'" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">👤 Login</a><a href="'+signup_href+'" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">✨ Sign Up</a>' if not authenticated else '<a href="?menu=logout" target="_self" style="display:block;padding:10px 12px;color:#ff8f8f;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⎋ Logout</a>'}
+            {profile_menu_html}
         </div>
     </details>
 </div>
