@@ -11,6 +11,7 @@ FastAPI backend for phishing URL detection with:
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import joblib
 import pickle
 import numpy as np
 import logging
@@ -133,14 +134,14 @@ metadata = None
 logger.info("Loading ML models...")
 for m in ["gb", "xgb", "rf", "stack"]:
     try:
-        models[m] = pickle.load(open(BASE_DIR / f"model_{m}.pkl", "rb"))
+        models[m] = joblib.load(BASE_DIR / f"model_{m}.pkl")
         logger.info(f"  ✅ Loaded model_{m}.pkl")
     except Exception as e:
         logger.error(f"  ❌ Error loading model_{m}.pkl: {e}")
 
 # Load feature names for validation
 try:
-    feature_names = pickle.load(open(BASE_DIR / "feature_names.pkl", "rb"))
+    feature_names = joblib.load(BASE_DIR / "feature_names.pkl")
     logger.info(f"  ✅ Loaded feature_names.pkl ({len(feature_names)} features)")
 except:
     feature_names = None
@@ -148,7 +149,7 @@ except:
 
 # Load metadata
 try:
-    metadata = pickle.load(open(BASE_DIR / "training_metadata.pkl", "rb"))
+    metadata = joblib.load(BASE_DIR / "training_metadata.pkl")
     logger.info(f"  ✅ Loaded training_metadata.pkl")
     logger.info(f"      Label encoding: {metadata.get('label_encoding', 'unknown')}")
 except:
