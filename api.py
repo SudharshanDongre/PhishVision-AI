@@ -21,6 +21,7 @@ import hmac
 import secrets
 import os
 from typing import Optional
+from pathlib import Path
 from extractor import extract_features, rule_based_check, get_domain_parts
 
 # Load environment variables (optional - graceful fallback)
@@ -40,6 +41,7 @@ logging.basicConfig(
     datefmt='%H:%M:%S'
 )
 logger = logging.getLogger("PhishVision-API")
+BASE_DIR = Path(__file__).resolve().parent
 
 # ============================================================================
 # USER AUTHENTICATION & DATABASE
@@ -131,14 +133,14 @@ metadata = None
 logger.info("Loading ML models...")
 for m in ["gb", "xgb", "rf", "stack"]:
     try:
-        models[m] = pickle.load(open(f"model_{m}.pkl", "rb"))
+        models[m] = pickle.load(open(BASE_DIR / f"model_{m}.pkl", "rb"))
         logger.info(f"  ✅ Loaded model_{m}.pkl")
     except Exception as e:
         logger.error(f"  ❌ Error loading model_{m}.pkl: {e}")
 
 # Load feature names for validation
 try:
-    feature_names = pickle.load(open("feature_names.pkl", "rb"))
+    feature_names = pickle.load(open(BASE_DIR / "feature_names.pkl", "rb"))
     logger.info(f"  ✅ Loaded feature_names.pkl ({len(feature_names)} features)")
 except:
     feature_names = None
@@ -146,7 +148,7 @@ except:
 
 # Load metadata
 try:
-    metadata = pickle.load(open("training_metadata.pkl", "rb"))
+    metadata = pickle.load(open(BASE_DIR / "training_metadata.pkl", "rb"))
     logger.info(f"  ✅ Loaded training_metadata.pkl")
     logger.info(f"      Label encoding: {metadata.get('label_encoding', 'unknown')}")
 except:

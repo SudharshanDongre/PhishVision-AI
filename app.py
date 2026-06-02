@@ -17,6 +17,8 @@ import secrets
 import os
 from news_component import render_cyber_news_notifications
 
+BASE_DIR = Path(__file__).resolve().parent
+
 # Load environment variables (optional - graceful fallback)
 try:
     from dotenv import load_dotenv
@@ -2752,10 +2754,10 @@ with st.sidebar:
 
     # Keep model_map for use in scan tabs
     model_map = {
-        "Stacking Ensemble (Strongest)": "model_stack.pkl",
-        "Gradient Boosting":             "model_gb.pkl",
-        "XGBoost":                       "model_xgb.pkl",
-        "Random Forest":                 "model_rf.pkl"
+        "Stacking Ensemble (Strongest)": BASE_DIR / "model_stack.pkl",
+        "Gradient Boosting":             BASE_DIR / "model_gb.pkl",
+        "XGBoost":                       BASE_DIR / "model_xgb.pkl",
+        "Random Forest":                 BASE_DIR / "model_rf.pkl"
     }
 
     st.markdown("""<hr style="border-color:#00ff8811; margin:20px 0;">""", unsafe_allow_html=True)
