@@ -10,6 +10,7 @@ Trains multiple ML models for phishing detection with:
 import pandas as pd
 import numpy as np
 import pickle
+import joblib
 import warnings
 import logging
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
@@ -164,7 +165,7 @@ gb = GradientBoostingClassifier(
 )
 gb.fit(X_train, y_train)
 models['gb'] = gb
-pickle.dump(gb, open('model_gb.pkl', 'wb'))
+joblib.dump(gb, 'model_gb.pkl')
 print(f"   ✅ Saved model_gb.pkl")
 
 # 2. XGBoost (Optimized)
@@ -172,7 +173,7 @@ print("\n2️⃣  Training XGBoost (Optimized)...")
 xgb = XGBClassifier(**CONFIG["xgb_params"])
 xgb.fit(X_train, y_train)
 models['xgb'] = xgb
-pickle.dump(xgb, open('model_xgb.pkl', 'wb'))
+joblib.dump(xgb, 'model_xgb.pkl')
 print(f"   ✅ Saved model_xgb.pkl")
 
 # 3. Random Forest
@@ -186,7 +187,7 @@ rf = RandomForestClassifier(
 )
 rf.fit(X_train, y_train)
 models['rf'] = rf
-pickle.dump(rf, open('model_rf.pkl', 'wb'))
+joblib.dump(rf, 'model_rf.pkl')
 print(f"   ✅ Saved model_rf.pkl")
 
 # 4. Stacking Ensemble
@@ -203,11 +204,11 @@ stack = StackingClassifier(
 )
 stack.fit(X_train, y_train)
 models['stack'] = stack
-pickle.dump(stack, open('model_stack.pkl', 'wb'))
+joblib.dump(stack, 'model_stack.pkl')
 print(f"   ✅ Saved model_stack.pkl")
 
 # Save feature names for validation
-pickle.dump(FEATURE_NAMES, open('feature_names.pkl', 'wb'))
+joblib.dump(FEATURE_NAMES, 'feature_names.pkl')
 print(f"\n   ✅ Saved feature_names.pkl")
 
 # ============================================================================
