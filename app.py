@@ -53,7 +53,11 @@ st.markdown("""
 }
 
 html, body, [data-testid="stAppViewContainer"] {
-    background-color: #0a0e14 !important;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 80% 0%, rgba(59, 130, 246, 0.16), transparent 30%),
+        radial-gradient(circle at 50% 80%, rgba(0, 255, 136, 0.08), transparent 26%),
+        linear-gradient(180deg, #070b12 0%, #0a1020 45%, #08101a 100%) !important;
     color: #e2e8f0 !important;
     font-family: 'Inter', sans-serif !important;
     overflow-x: hidden !important;
@@ -135,6 +139,143 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 .phishvision-navbar-spacer {
     height: 0;
+}
+
+.phishvision-hero {
+    min-height: calc(100vh - var(--phishvision-navbar-height));
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 2rem 1.25rem 3rem 1.25rem;
+}
+
+.phishvision-hero::before,
+.phishvision-hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(18px);
+    pointer-events: none;
+}
+
+.phishvision-hero::before {
+    width: 320px;
+    height: 320px;
+    top: 6%;
+    left: -90px;
+    background: rgba(0, 212, 255, 0.14);
+}
+
+.phishvision-hero::after {
+    width: 260px;
+    height: 260px;
+    bottom: 6%;
+    right: -80px;
+    background: rgba(59, 130, 246, 0.14);
+}
+
+.phishvision-hero-card {
+    width: min(920px, calc(100vw - 32px));
+    background: linear-gradient(160deg, rgba(11, 18, 34, 0.86), rgba(7, 14, 26, 0.72));
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
+    border-radius: 28px;
+    backdrop-filter: blur(18px) saturate(120%);
+    padding: 2.3rem 2rem;
+    position: relative;
+}
+
+.phishvision-hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(59, 130, 246, 0.05), rgba(0, 255, 136, 0.16));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+}
+
+.phishvision-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    background: rgba(8, 15, 28, 0.7);
+    color: #8adfff;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+}
+
+.phishvision-hero-title {
+    margin: 0;
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.2rem, 5vw, 4.1rem);
+    line-height: 1.05;
+    letter-spacing: 0.18em;
+    color: #15d6ff;
+    text-shadow: 0 0 26px rgba(0, 212, 255, 0.28);
+}
+
+.phishvision-hero-subtitle {
+    margin: 1rem auto 0 auto;
+    max-width: 46rem;
+    color: #9fb0c9;
+    font-size: 0.98rem;
+    line-height: 1.75;
+}
+
+.phishvision-hero-features {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem 0 1.7rem 0;
+}
+
+.phishvision-hero-chip {
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.62);
+    color: #dbe7f7;
+    font-size: 0.83rem;
+}
+
+.phishvision-hero-cta {
+    width: min(430px, 100%);
+    margin: 0 auto;
+}
+
+.phishvision-hero-cta .stButton > button {
+    height: 54px;
+    border-radius: 16px !important;
+    border: 1px solid rgba(59, 130, 246, 0.22) !important;
+    background: linear-gradient(90deg, #1ec7ff 0%, #136dff 100%) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    box-shadow: 0 18px 40px rgba(19, 109, 255, 0.28) !important;
+}
+
+.phishvision-hero-cta .stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 48px rgba(19, 109, 255, 0.38) !important;
+}
+
+.phishvision-hero-note {
+    margin-top: 0.85rem;
+    color: #7f92af;
+    font-size: 0.8rem;
+    text-align: center;
 }
 
             
@@ -2079,9 +2220,16 @@ def _api_get_user(email):
 
 
 def _init_auth_state():
-    if "authenticated" not in st.session_state:
-        # authenticated state now handled by st.user.is_logged_in (Google OAuth)
-        pass
+    if "user_name" not in st.session_state:
+        if st.user.is_logged_in:
+            st.session_state.user_name = getattr(st.user, "name", None) or "User"
+        else:
+            st.session_state.user_name = "User"
+    if "user_email" not in st.session_state:
+        if st.user.is_logged_in:
+            st.session_state.user_email = getattr(st.user, "email", None) or ""
+        else:
+            st.session_state.user_email = ""
     if "auth_view" not in st.session_state:
         st.session_state.auth_view = "login"
     if "show_auth_panel" not in st.session_state:
@@ -2094,7 +2242,13 @@ def _sync_settings_from_query():
     if action == "settings" and st.user.is_logged_in:
         st.session_state.show_settings = True
         st.query_params.clear()
-    elif action == "logout":
+
+
+def _sync_logout_from_query():
+    action = st.query_params.get("menu")
+    if action == "logout" and st.user.is_logged_in:
+        st.query_params.clear()
+        _reset_auth_state()
         st.logout()
 
 def _sync_auth_from_query():
@@ -2130,6 +2284,11 @@ def _close_auth_modal():
     st.session_state.show_auth_panel = False
 
 
+def _reset_auth_state() -> None:
+    for key in ("user_name", "user_email", "show_settings", "auth_view", "show_auth_panel"):
+        st.session_state.pop(key, None)
+
+
 def render_settings_page():
     st.markdown('<div style="max-width:600px; margin:0 auto;">', unsafe_allow_html=True)
     st.markdown('<div style="font-family:Orbitron; color:#00ff88; font-size:1.5rem; margin-bottom:20px; letter-spacing:2px;">⚙️ SETTINGS</div>', unsafe_allow_html=True)
@@ -2137,8 +2296,10 @@ def render_settings_page():
     with st.form("settings_form"):
         st.markdown('<div style="color:#94a3b8; font-size:0.9rem; margin-bottom:12px; font-weight:600;">PROFILE</div>', unsafe_allow_html=True)
         
-        new_name = st.text_input("Full Name", value=st.session_state.user_name, key="settings_name")
-        new_email = st.text_input("Email", value=st.session_state.user_email, key="settings_email", disabled=True, help="Email cannot be changed")
+        current_name = st.session_state.get("user_name", st.user.name or "User")
+        current_email = st.session_state.get("user_email", st.user.email or "")
+        new_name = st.text_input("Full Name", value=current_name, key="settings_name")
+        new_email = st.text_input("Email", value=current_email, key="settings_email", disabled=True, help="Email cannot be changed")
         
         st.markdown('<div style="color:#94a3b8; font-size:0.9rem; margin:20px 0 12px 0; font-weight:600;">SECURITY</div>', unsafe_allow_html=True)
         
@@ -2165,7 +2326,7 @@ def render_settings_page():
                     update_data["password"] = new_password
                 
                 # Call backend API to update profile
-                update_result = _api_update_profile(st.session_state.user_email, **update_data)
+                update_result = _api_update_profile(current_email, **update_data)
                 
                 if update_result.get("success"):
                     st.session_state.user_name = new_name.strip()
@@ -2342,27 +2503,39 @@ def show_auth_modal(mode="login"):
 
 _apply_base_styles()
 
+_init_auth_state()
+_sync_settings_from_query()
+_sync_logout_from_query()
+
 # ══════════════════════════════════════════════════════════════
 # GOOGLE AUTHENTICATION — st.login() native OIDC
 # ══════════════════════════════════════════════════════════════
 
 if not st.user.is_logged_in:
     st.markdown("""
-    <div style="display:flex;flex-direction:column;align-items:center;
-                justify-content:center;height:80vh;gap:24px;text-align:center;">
-        <div style="font-size:4rem;">🛡️</div>
-        <div style="font-family:'Orbitron',monospace;color:#00d4ff;
-                    font-size:2.2rem;font-weight:900;letter-spacing:4px;">
-            PHISHVISION AI
-        </div>
-        <div style="color:#94a3b8;font-size:1rem;letter-spacing:2px;">
-            SIGN IN TO ACCESS THE PLATFORM
+    <div class="phishvision-hero">
+        <div class="phishvision-hero-card">
+            <div class="phishvision-hero-badge">🛡️ AI SECURITY PLATFORM</div>
+            <h1 class="phishvision-hero-title">PHISHVISION AI</h1>
+            <div class="phishvision-hero-subtitle">
+                Detect phishing threats, protect your identity, and keep your workspace secure with a modern defense-first experience.
+            </div>
+            <div class="phishvision-hero-features">
+                <span class="phishvision-hero-chip">Real-time URL analysis</span>
+                <span class="phishvision-hero-chip">Threat intelligence dashboard</span>
+                <span class="phishvision-hero-chip">Google-secured access</span>
+            </div>
+            <div class="phishvision-hero-cta">
+    """, unsafe_allow_html=True)
+
+    if st.button("🔐  Continue with Google", use_container_width=True):
+        st.login()
+
+    st.markdown("""
+            <div class="phishvision-hero-note">Use your verified Google account to sign in securely.</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1.5, 1, 1.5])
-    with col2:
-        st.button("🔐  Sign in with Google", on_click=st.login, use_container_width=True)
     st.stop()
 
 # ── User logged in — app continues ──────────────────────────
@@ -2370,7 +2543,11 @@ authenticated = True
 profile_name = st.user.name or st.user.email or "User"
 profile_email = st.user.email or ""
 settings_href = "?menu=settings"
-profile_menu_html = f'<a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a>'
+logout_href = "?menu=logout"
+profile_menu_html = (
+    f'<a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a>'
+    f'<a href="{logout_href}" target="_self" style="display:block;padding:10px 12px;color:#fca5a5;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;border-top:1px solid rgba(148,163,184,0.12);margin-top:4px;">⏻ Logout</a>'
+)
 
 name_parts = str(profile_name).strip().split()
 profile_initials = "".join(p[0] for p in name_parts[:2]).upper() if name_parts else "U"
@@ -2477,6 +2654,10 @@ components.html(
 )
 
 render_cyber_news_notifications()
+
+if st.session_state.get("show_settings"):
+    render_settings_page()
+    st.stop()
 
 
 # ══════════════════════════════════════════════════════════════
@@ -2720,19 +2901,6 @@ with st.sidebar:
     })();
     </script>
     """, height=0, width=0)
-
-    # Active engine indicator
-    st.markdown("""
-    <div class="engine-active-indicator" style="display:flex; align-items:center; gap:8px;
-            padding:6px 4px; margin-top:4px;">
-        <span style="font-family:'Inter',sans-serif; font-size:0.75rem;
-                 color:#64748b;">Engine A</span>
-        <span style="width:8px; height:8px; background:#22c55e;
-                     border-radius:50%; display:inline-block;"></span>
-        <span style="font-family:'Inter',sans-serif; font-size:0.75rem;
-                     color:#22c55e; font-weight:500;">Active</span>
-    </div>
-    """, unsafe_allow_html=True)
 
     # Keep model_map for use in scan tabs
     model_map = {
