@@ -555,53 +555,15 @@ def init_auth_state():
 
 
 def check_authentication():
-    """Check if user has valid session."""
-    token = st.session_state.get("session_token")
-    print(f"[DEBUG CHECK_AUTH] Checking authentication with token: {token}")
-    print(f"[DEBUG CHECK_AUTH] Current session state - is_authenticated: {st.session_state.get('is_authenticated')}, username: {st.session_state.get('username')}")
+    """Check if user has valid session - uses session_state as source of truth."""
     
-    # First check if already authenticated in this session
-    if st.session_state.get("is_authenticated") and st.session_state.get("username"):
-        print(f"[DEBUG CHECK_AUTH] User already marked authenticated in session state")
-        if token:
-            # Validate the token is still valid
-            is_valid, username = validate_session(token)
-            if is_valid:
-                print(f"[DEBUG CHECK_AUTH] Token validation confirmed! Returning True")
-                return True
-            else:
-                print(f"[DEBUG CHECK_AUTH] Token validation failed, clearing session")
-                st.session_state.session_token = None
-                st.session_state.is_authenticated = False
-                st.session_state.username = None
-                return False
-        else:
-            # Authenticated but no token - clear and return false
-            st.session_state.is_authenticated = False
-            st.session_state.username = None
-            return False
+    # If already authenticated in this session, trust it directly
+    if (st.session_state.get("is_authenticated") 
+            and st.session_state.get("username")):
+        return True
     
-    # No session state, check if token exists and is valid
-    if token:
-        is_valid, username = validate_session(token)
-        print(f"[DEBUG CHECK_AUTH] validate_session returned: is_valid={is_valid}, username={username}")
-        
-        if is_valid:
-            st.session_state.is_authenticated = True
-            st.session_state.username = username
-            print(f"[DEBUG CHECK_AUTH] Session valid! Returning True")
-            return True
-        else:
-            # Invalid session
-            st.session_state.session_token = None
-            st.session_state.is_authenticated = False
-            st.session_state.username = None
-            print(f"[DEBUG CHECK_AUTH] Session invalid! Returning False")
-            return False
-    
-    print(f"[DEBUG CHECK_AUTH] No token found, returning False")
+    # No active session
     return False
-
 
 def show_auth_page():
     """Show appropriate authentication page."""
