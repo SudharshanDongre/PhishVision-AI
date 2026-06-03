@@ -2338,13 +2338,13 @@ def show_auth_modal(mode="login"):
         }
         </style>
         """, unsafe_allow_html=True)
-        _render_auth_modal_body(auth_view)
+        # _render_auth_modal_body(auth_view)
 
+_apply_base_styles()
 
 # ══════════════════════════════════════════════════════════════
 # GOOGLE AUTHENTICATION — st.login() native OIDC
 # ══════════════════════════════════════════════════════════════
-_apply_base_styles()
 
 if not st.user.is_logged_in:
     st.markdown("""
@@ -2365,7 +2365,7 @@ if not st.user.is_logged_in:
         st.button("🔐  Sign in with Google", on_click=st.login, use_container_width=True)
     st.stop()
 
-# ── User logged in — set variables for rest of app ──────────
+# ── User logged in — app continues ──────────────────────────
 authenticated = True
 profile_name = st.user.name or st.user.email or "User"
 profile_email = st.user.email or ""
