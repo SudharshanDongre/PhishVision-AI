@@ -2080,7 +2080,8 @@ def _api_get_user(email):
 
 def _init_auth_state():
     if "authenticated" not in st.session_state:
-        st.session_state.authenticated = False
+        # authenticated state now handled by st.user.is_logged_in (Google OAuth)
+        pass
     if "auth_view" not in st.session_state:
         st.session_state.auth_view = "login"
     if "show_auth_panel" not in st.session_state:
@@ -2088,31 +2089,16 @@ def _init_auth_state():
     if "show_settings" not in st.session_state:
         st.session_state.show_settings = False
 
-
 def _sync_settings_from_query():
     action = st.query_params.get("menu")
-    if action == "settings" and st.session_state.get("authenticated", False):
+    if action == "settings" and st.user.is_logged_in:
         st.session_state.show_settings = True
         st.query_params.clear()
-    elif action == "settings":
-        st.session_state.auth_view = "login"
-        st.session_state.show_auth_panel = True
-        st.query_params.clear()
     elif action == "logout":
-        st.session_state.authenticated = False
-        st.session_state.user_email = ""
-        st.session_state.user_name = ""
-        st.session_state.show_auth_panel = False
-        st.query_params.clear()
-
+        st.logout()
 
 def _sync_auth_from_query():
-    action = st.query_params.get("menu")
-    if action in {"login", "signup"}:
-        st.session_state.auth_view = action
-        st.session_state.show_auth_panel = True
-        st.session_state.page = "Dashboard"
-        st.query_params.clear()
+    pass  # Handled by Google OAuth now
 
 
 def _navigate_to_page(page_name: str) -> None:
@@ -2120,17 +2106,7 @@ def _navigate_to_page(page_name: str) -> None:
 
 
 def _restore_auth_from_query():
-    if st.session_state.get("authenticated"):
-        return
-    email_from_query = st.query_params.get("ue")
-    if not email_from_query:
-        return
-    user_result = _api_get_user(str(email_from_query).strip().lower())
-    if user_result.get("success") and user_result.get("user"):
-        user = user_result["user"]
-        st.session_state.authenticated = True
-        st.session_state.user_email = user.get("email", "")
-        st.session_state.user_name = user.get("full_name", "User")
+    pass  # Handled by Google OAuth now
 
 
 def _apply_base_styles():
@@ -2251,7 +2227,6 @@ def _render_auth_modal_body(auth_view: str):
             else:
                 reg_result = _api_register(email_norm, full_name.strip(), password)
                 if reg_result.get("success"):
-                    st.session_state.authenticated = True
                     st.session_state.user_email = email_norm
                     st.session_state.user_name = full_name.strip()
                     st.session_state.show_auth_panel = False
@@ -2289,7 +2264,6 @@ def _render_auth_modal_body(auth_view: str):
             else:
                 auth_result = _api_login(email.strip().lower(), password)
                 if auth_result.get("success"):
-                    st.session_state.authenticated = True
                     st.session_state.user_email = auth_result["user"]["email"]
                     st.session_state.user_name = auth_result["user"]["full_name"]
                     st.session_state.show_auth_panel = False
@@ -2367,29 +2341,37 @@ def show_auth_modal(mode="login"):
         _render_auth_modal_body(auth_view)
 
 
-_init_auth_state()
+# ══════════════════════════════════════════════════════════════
+# GOOGLE AUTHENTICATION — st.login() native OIDC
+# ══════════════════════════════════════════════════════════════
 _apply_base_styles()
-_restore_auth_from_query()
-_sync_settings_from_query()
-_sync_auth_from_query()
 
-if st.session_state.show_settings:
-    render_settings_page()
+if not st.user.is_logged_in:
+    st.markdown("""
+    <div style="display:flex;flex-direction:column;align-items:center;
+                justify-content:center;height:80vh;gap:24px;text-align:center;">
+        <div style="font-size:4rem;">🛡️</div>
+        <div style="font-family:'Orbitron',monospace;color:#00d4ff;
+                    font-size:2.2rem;font-weight:900;letter-spacing:4px;">
+            PHISHVISION AI
+        </div>
+        <div style="color:#94a3b8;font-size:1rem;letter-spacing:2px;">
+            SIGN IN TO ACCESS THE PLATFORM
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([1.5, 1, 1.5])
+    with col2:
+        st.button("🔐  Sign in with Google", on_click=st.login, use_container_width=True)
     st.stop()
 
-show_auth_modal(st.session_state.get("auth_view", "login"))
+# ── User logged in — set variables for rest of app ──────────
+authenticated = True
+profile_name = st.user.name or st.user.email or "User"
+profile_email = st.user.email or ""
+settings_href = "?menu=settings"
+profile_menu_html = f'<a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a>'
 
-
-authenticated = st.session_state.get("authenticated", False)
-profile_name = st.session_state.get("user_name") or st.session_state.get("user_email", "User")
-profile_email = st.session_state.get("user_email", "")
-settings_href = f"?menu=settings&ue={quote(profile_email)}" if profile_email else "?menu=settings"
-login_href = "?menu=login"
-signup_href = "?menu=signup"
-if authenticated:
-    profile_menu_html = f'<a href="{settings_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⚙️ Settings</a><a href="?menu=logout" target="_self" style="display:block;padding:10px 12px;color:#ff8f8f;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">⎋ Logout</a>'
-else:
-    profile_menu_html = f'<a href="{login_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">👤 Login</a><a href="{signup_href}" target="_self" style="display:block;padding:10px 12px;color:#e2e8f0;text-decoration:none;font-family:Inter,sans-serif;font-size:0.82rem;">✨ Sign Up</a>'
 name_parts = str(profile_name).strip().split()
 profile_initials = "".join(p[0] for p in name_parts[:2]).upper() if name_parts else "U"
 logo_uri = _image_to_data_uri("logo.png")
@@ -2892,7 +2874,7 @@ st.markdown("<div style='height:0;'></div>", unsafe_allow_html=True)
 if page == "URL Scan":
     section_title("Target URL Analysis", "Enter URL for deep inspection")
 
-    if not st.session_state.get("authenticated", False):
+    if not st.user.is_logged_in:
         st.markdown("""
         <div style="margin:12px 0 18px 0; padding:16px 18px; border-radius:12px;
              border:1px solid rgba(255,75,75,0.28); background:rgba(26,5,5,0.8); color:#ffd5d5;">
@@ -2917,13 +2899,13 @@ if page == "URL Scan":
         "◈  TARGET URL",
         placeholder="https://example.com  or  www.suspicioussite.tk/login/verify",
         help="Enter any URL with or without https://",
-        disabled=not st.session_state.get("authenticated", False)
+        disabled=not st.user.is_logged_in
     )
+    
 
     col_btn, col_empty = st.columns([2, 3])
     with col_btn:
-        scan_clicked = st.button("⚡  INITIATE SCAN", disabled=not st.session_state.get("authenticated", False))
-
+        scan_clicked = st.button("⚡  INITIATE SCAN", disabled=not st.user.is_logged_in)
     if scan_clicked:
         if current_model is None:
             st.markdown(f"""
@@ -3158,7 +3140,7 @@ if page == "URL Scan":
 elif page == "Bulk Scan":
     section_title("Batch Threat Analysis", "Upload CSV file for mass URL scanning")
 
-    if not st.session_state.get("authenticated", False):
+    if not st.user.is_logged_in:
         st.markdown("""
         <div class="ui-alert">
             Log in from the profile menu to unlock batch scanning.
@@ -3173,7 +3155,7 @@ elif page == "Bulk Scan":
     </div>
     """, unsafe_allow_html=True)
 
-    uploaded_file = st.file_uploader("", type=['csv'], label_visibility="collapsed", disabled=not st.session_state.get("authenticated", False))
+    uploaded_file = st.file_uploader("", type=['csv'], label_visibility="collapsed", disabled=not st.user.is_logged_in)
 
     if uploaded_file and current_model:
         df_bulk = pd.read_csv(uploaded_file)
